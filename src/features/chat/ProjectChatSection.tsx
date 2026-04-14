@@ -107,18 +107,17 @@ export function ProjectChatSection({
     const message = draft.trim();
     if (!message) return;
 
-    addOptimistic({
-      id: `optimistic-${crypto.randomUUID()}`,
-      role: 'user',
-      content: message,
-    });
-
     const fd = new FormData();
     fd.set('message', message);
     fd.set('pastedContext', pastedDraft.trim());
     setDraft('');
     setPastedDraft('');
     startTransition(() => {
+      addOptimistic({
+        id: `optimistic-${crypto.randomUUID()}`,
+        role: 'user',
+        content: message,
+      });
       void formAction(fd);
     });
   };
