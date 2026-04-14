@@ -1,6 +1,5 @@
 # Shop Marco — backlog → Bitrix24
-# Dry-run: npm run sync -- plans/shop-marco-code.plan.yaml --dry-run
-# Sync:    npm run sync -- plans/shop-marco-code.plan.yaml
+# Синхронизация с Bitrix — из веб-приложения (см. README).
 
 project_title: 'Shop Marco — e-commerce'
 

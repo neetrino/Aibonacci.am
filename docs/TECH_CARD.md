@@ -109,7 +109,7 @@
 | 7.7 | SMS | None | ✅ | |
 | 7.8 | AI | OpenAI API (server-only); optional Vercel AI SDK | ✅ | Key in env |
 | 7.9 | CMS | None | ✅ | |
-| 7.10 | Bitrix24 | Incoming webhook REST (`Webhook_URL`); existing `src/sync-plan.ts` contract | ✅ | |
+| 7.10 | Bitrix24 | Incoming webhook REST (`Webhook_URL`); plan contract `plans/example.plan.yaml` / `src/shared/domain/plan.ts` | ✅ | |
 
 ---
 

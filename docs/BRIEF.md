@@ -1,7 +1,7 @@
 # Product brief — PlanRelay
 
 **Product name (working).** PlanRelay  
-**Repository.** Bitrix24-Task (CLI sync + future web app)  
+**Repository.** Bitrix24-Task (PlanRelay web app)  
 **Last updated.** 2026-04-14
 
 ---
@@ -24,9 +24,9 @@ PlanRelay is a team web application that combines **AI-assisted planning**, a st
 1. **Auth + projects + phases + chat history** — high  
 2. **AI chat → validated plan (YAML-shaped)** — high  
 3. **Task list UI + edit/delete + AI revise** — high  
-4. **Per-project Bitrix IDs** (`Bitrix24_Project_id`, `Task_owner_id`, `Task_Assignee_id`) — high  
+4. **Per-project Bitrix IDs** (stored in DB: project/group, owner, assignee) — high  
 5. **Markdown download** — high  
-6. **Bitrix sync** (reuse `sync-plan` logic) — high  
+6. **Bitrix sync** (`src/server/bitrix/*`) — high  
 7. **Webhook + OpenAI only in env** — high (security)  
 8. **YAML download / dry-run** — medium  
 
@@ -38,7 +38,7 @@ PlanRelay is a team web application that combines **AI-assisted planning**, a st
 - **Database:** **Neon** (PostgreSQL) + **Prisma**  
 - **Auth:** **Auth.js**  
 - **AI:** OpenAI (server-side only)  
-- **Bitrix:** existing incoming webhook + `src/sync-plan.ts` contract  
+- **Bitrix:** incoming webhook + shared plan contract (`plans/example.plan.yaml` / `src/shared/domain/plan.ts`)  
 
 ---
 
@@ -76,5 +76,4 @@ PlanRelay is a team web application that combines **AI-assisted planning**, a st
 
 ## Extra notes
 
-- CLI workflow (`npm run sync`, `plans/*.md` / `*.yaml`) remains valid for users who do not use the web UI.  
 - Product codename **PlanRelay** — relay plans to Bitrix and to developer Markdown.

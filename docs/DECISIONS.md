@@ -46,6 +46,6 @@
 
 **Context.** Webhook URLs are sensitive; OpenAI keys must not leak to browsers.
 
-**Decision.** Store `Webhook_URL` and `OpenAI_API_Key` / `OPENAI_API_KEY` only in deployment environment and server-side code. Per-project **Bitrix numeric IDs** (`Bitrix24_Project_id`, `Task_owner_id`, `Task_Assignee_id`) live in the database.
+**Decision.** Store `Webhook_URL` and `OpenAI_API_Key` / `OPENAI_API_KEY` only in deployment environment and server-side code. Per-project **Bitrix numeric IDs** (project/group, task owner, assignee — see Prisma `Project` fields) live in the database.
 
 **Consequences.** Dashboard edits IDs, not webhook; CLI users keep using `.env` as today.

@@ -1,6 +1,5 @@
 # Машинный план после согласования черновика (plans/example-plan.md или plan.md).
-# Сухой прогон: npm run sync -- plans/example.plan.yaml --dry-run
-# Заливка:     npm run sync -- plans/example.plan.yaml
+# Синхронизация с Bitrix — из веб-приложения после сохранения плана (см. README).
 
 # Название для логов (необязательно)
 project_title: 'Пример: демо-план'

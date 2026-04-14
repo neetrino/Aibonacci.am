@@ -26,6 +26,8 @@ pnpm dev
 
 Откройте [http://localhost:3000](http://localhost:3000). Раздел приложения: `/app` (magic link по email; без Resend в dev ссылка логируется через `pino`).
 
+**Синхронизация с Bitrix24** выполняется из приложения: настройте `Webhook_URL` в `.env`, а **ID проекта в Bitrix, постановщика и исполнителя** — в настройках проекта в UI (не через переменные окружения).
+
 ### Команды
 
 | Команда | Назначение |
@@ -36,49 +38,22 @@ pnpm dev
 | `pnpm typecheck` | TypeScript |
 | `pnpm test` | Vitest |
 | `pnpm e2e` | Playwright (нужен dev-сервер или `PLAYWRIGHT_BASE_URL`) |
-| `pnpm run sync -- plans/example.plan.yaml --dry-run` | CLI синхронизации с Bitrix |
 
 ---
 
-## CLI: Markdown → YAML → Bitrix
+## Черновики планов в `plans/`
 
-**Сначала** черновик в **`plans/*.md`** (удобно читать), шаблон — `plans/example-plan.md` (структура как у обычного `plan.md`: заголовки `##` = эпики, списки = задачи). Файлы вида `*.plan.md` в этом проекте открываются как Markdown — см. `.vscode/settings.json`. **После согласования** — перенос в **`plans/*.yaml`** (`plans/example.plan.yaml`) и синхронизация с Bitrix. Смена проекта: **`Bitrix24_Project_id`** в `.env`. Подробнее — `.cursor/rules/bitrix24-workflow.mdc`.
+**Черновик** удобно вести в **`plans/*.md`** — шаблон `plans/example-plan.md` (заголовки `##` = эпики, списки = задачи). Файлы вида `*.plan.md` открываются как Markdown — см. `.vscode/settings.json`. **YAML** (`plans/example.plan.yaml`) — контракт для парсера и синка в приложении. Подробнее — `.cursor/rules/bitrix24-workflow.mdc`.
 
 ## `.env`
 
-| Переменная                | Описание                                                                           |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| `Webhook_URL`             | URL вебхука со слэшем в конце                                                      |
-| `Bitrix24_Project_id`     | ID группы / проекта / Scrum в Bitrix                                               |
-| `Task_owner_id`           | `CREATED_BY` — постановщик (от чьего имени создаётся задача)                       |
-| `Task_Assignee_id`        | `RESPONSIBLE_ID` — исполнитель (в YAML `responsible_id` переопределяет только его) |
-| `Bitrix24_responsible_id` | Опционально: fallback для owner и assignee, если переменные выше не заданы         |
+| Переменная    | Описание                                      |
+| ------------- | --------------------------------------------- |
+| `Webhook_URL` | URL вебхука Bitrix24 со слэшем в конце        |
+
+Остальные параметры Bitrix (проект, `CREATED_BY`, `RESPONSIBLE_ID`) задаются **в настройках проекта** в веб-приложении.
 
 `.env` не коммитить. Шаблон — `.env.example`.
-
-## Команды CLI
-
-Один раз после клонирования:
-
-```bash
-pnpm install
-```
-
-Проверка плана без создания задач в Bitrix:
-
-```bash
-pnpm run sync -- plans/example.plan.yaml --dry-run
-```
-
-Создание эпиков и задач в Bitrix (после проверки плана):
-
-```bash
-pnpm run sync -- plans/example.plan.yaml
-```
-
-Своё ТЗ — копируйте `example-plan.md` / `example.plan.yaml` в новые файлы и подставьте имя в командах `sync`.
-
-Поле **`epic_mode`**: `scrum` (эпики API) или `parent_tasks` (родитель + подзадачи), если Scrum/API эпика недоступен.
 
 Подробности для агента: `.cursor/rules/`.
 

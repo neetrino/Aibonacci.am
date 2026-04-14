@@ -1,5 +1,5 @@
 ---
-description: Стиль кода для src/sync-plan.ts и новых TS-скриптов
+description: Стиль TypeScript для серверного кода и скриптов (Prisma seed и т.д.)
 globs: src/**/*.ts
 alwaysApply: false
 ---
@@ -10,4 +10,4 @@ alwaysApply: false
 - Только **named exports** (без `default export`), кроме точки входа CLI без реэкспорта.
 - Новая логика Bitrix: выносить в маленькие функции; один файл — одна ответственность; вложенность не глубже трёх уровней.
 - Секреты и полный URL вебхука не хардкодить — только `process.env` и `.env` локально.
-- После изменений: `npm run sync -- plans/example.plan.yaml --dry-run` для проверки.
+- После изменений в Bitrix-синке: `pnpm typecheck` и при необходимости e2e / ручная проверка синка в UI.
