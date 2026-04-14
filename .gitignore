@@ -3,4 +3,5 @@ dist/
 .env
 *.log
 plans/*.local.yaml
+plans/*.local.md
 plans/*-synced.yaml

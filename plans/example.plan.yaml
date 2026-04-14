@@ -1,7 +1,6 @@
-# План задач для проверки глазами. После утверждения:
-#   npm run sync -- plans/example.plan.yaml
-# Сухой прогон (ничего не создаёт в Bitrix):
-#   npm run sync -- plans/example.plan.yaml --dry-run
+# Машинный план после согласования черновика в example.plan.md.
+# Сухой прогон: npm run sync -- plans/example.plan.yaml --dry-run
+# Заливка:     npm run sync -- plans/example.plan.yaml
 
 # Название для логов (необязательно)
 project_title: "Пример: демо-план"
