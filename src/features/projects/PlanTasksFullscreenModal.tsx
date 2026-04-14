@@ -16,6 +16,12 @@ type EditingTarget = { epicIndex: number; taskIndex: number };
 
 type TasksViewMode = 'grid' | 'list';
 
+/** Left strip (~20% viewport): glass backdrop, click closes drawer. */
+const TASKS_DRAWER_BACKDROP_WIDTH_CLASS = 'w-1/5';
+/** Right panel (~80% viewport): task list. */
+const TASKS_DRAWER_PANEL_WIDTH_CLASS = 'w-4/5';
+const TASKS_DRAWER_SLIDE_TRANSITION_CLASS = 'transition-transform duration-300 ease-out';
+
 export function PlanTasksFullscreenModal({
   open,
   onClose,
@@ -70,6 +76,7 @@ export function PlanTasksFullscreenModal({
   const searchId = useId();
   const tasksLayoutRegionId = useId();
   const [mounted, setMounted] = useState(false);
+  const [panelEntered, setPanelEntered] = useState(false);
   const [viewMode, setViewMode] = useState<TasksViewMode>('grid');
   const rows = useMemo(() => buildFlatPlanTasks(plan), [plan]);
   const filtered = useMemo(() => filterFlatPlanTasks(rows, search), [rows, search]);
@@ -96,22 +103,41 @@ export function PlanTasksFullscreenModal({
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open) return;
+    setPanelEntered(false);
+    let cancelled = false;
+    const outerId = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!cancelled) setPanelEntered(true);
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(outerId);
+    };
+  }, [open]);
+
   if (!mounted || !open) return null;
 
   const content: ReactNode = (
     <div
       aria-labelledby={titleId}
       aria-modal="true"
-      className="fixed inset-0 z-[100] flex items-stretch justify-center p-3 sm:p-4"
+      className="fixed inset-0 z-[100] flex flex-row"
       role="dialog"
     >
       <button
         aria-label="Close dialog"
-        className="absolute inset-0 bg-black/65 backdrop-blur-[2px]"
+        className={`${TASKS_DRAWER_BACKDROP_WIDTH_CLASS} h-dvh shrink-0 cursor-pointer border-0 bg-slate-950/35 p-0 backdrop-blur-xl backdrop-saturate-150 transition-colors hover:bg-slate-950/45`}
         onClick={onClose}
         type="button"
       />
-      <div className="relative z-[101] flex h-[min(100dvh,100vh)] w-full max-w-[100vw] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl shadow-black/60 ring-1 ring-white/5 backdrop-blur-xl">
+      <div
+        className={`relative z-[101] flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden rounded-l-2xl border border-white/10 border-r-0 bg-slate-950/95 shadow-2xl shadow-black/60 ring-1 ring-white/5 backdrop-blur-xl ${TASKS_DRAWER_PANEL_WIDTH_CLASS} ${TASKS_DRAWER_SLIDE_TRANSITION_CLASS} ${
+          panelEntered ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         <div className="flex shrink-0 flex-col gap-3 border-b border-white/10 px-4 py-3 sm:px-5">
           <div className="flex items-start justify-between gap-3">
             <div>
