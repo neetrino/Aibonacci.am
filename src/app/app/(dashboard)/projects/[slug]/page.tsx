@@ -1,15 +1,14 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProjectChatSection } from '@/features/chat/ProjectChatSection';
 import { PhasePills } from '@/features/phases/PhasePills';
 import { PlanTasksPanel } from '@/features/projects/PlanTasksPanel';
-import { ProjectSettingsAside } from '@/features/projects/ProjectSettingsAside';
+import { ProjectBitrixSetupPanel } from '@/features/projects/ProjectBitrixSetupPanel';
 import { getProjectForUser } from '@/features/projects/project-queries';
 import { DEFAULT_PLAN, parsePlanFromJson, type PlanPayload } from '@/shared/domain/plan';
 import { getEffectiveChatModel } from '@/shared/lib/openai-model';
 import { prisma } from '@/shared/lib/prisma';
 import { requireActiveUserId } from '@/shared/lib/session';
-import { WORKSPACE_BODY_CLASS, WORKSPACE_LINK_CLASS, WORKSPACE_PANEL_CLASS } from '@/shared/ui/workspace-ui';
+import { WORKSPACE_PANEL_CLASS } from '@/shared/ui/workspace-ui';
 
 function resolvePlanPayload(snapshotPayload: unknown | null): PlanPayload {
   if (!snapshotPayload) return DEFAULT_PLAN;
@@ -77,30 +76,27 @@ export default async function ProjectPage({
   }));
 
   return (
-    <div className="flex min-h-0 flex-col gap-4">
-      <header className="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <Link className={WORKSPACE_LINK_CLASS} href="/app">
-            ← All projects
-          </Link>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight text-white sm:text-2xl">
-            {project.name}
-          </h1>
-        </div>
-        <p className={`max-w-xl ${WORKSPACE_BODY_CLASS} text-xs sm:text-sm`}>
-          Center: chat. Left: AI plan tasks. Right: Bitrix and export. AI model and plan JSON live in My
-          account.
-        </p>
+    <div className="flex min-h-0 flex-col gap-3">
+      <header className="flex min-w-0 shrink-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h1 className="min-w-0 max-w-full truncate text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+          {project.name}
+        </h1>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:h-[calc(100vh-9.5rem)] lg:grid-cols-[minmax(240px,280px)_minmax(0,1fr)_minmax(260px,300px)] lg:gap-5 lg:overflow-hidden">
-        <aside className="order-2 flex min-h-0 flex-col gap-3 overflow-hidden lg:order-1">
-          <div className={`shrink-0 p-4 ${WORKSPACE_PANEL_CLASS}`}>
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:h-[calc(100vh-8.75rem)] lg:grid-cols-[minmax(220px,280px)_minmax(0,1fr)] lg:gap-4 lg:overflow-hidden lg:-mx-6">
+        <aside className="order-2 flex min-h-0 flex-col gap-2 overflow-hidden lg:order-1 lg:pl-6">
+          <div className={`shrink-0 p-3 ${WORKSPACE_PANEL_CLASS}`}>
             <PhasePills
               activePhaseId={activePhaseId}
               phases={phases}
               projectId={project.id}
               projectSlug={project.slug}
+            />
+            <ProjectBitrixSetupPanel
+              activePhaseId={activePhaseId}
+              exportMd={exportMd}
+              exportYaml={exportYaml}
+              project={project}
             />
           </div>
           <div className="min-h-0 flex-1 overflow-hidden">
@@ -108,7 +104,7 @@ export default async function ProjectPage({
           </div>
         </aside>
 
-        <section className="order-1 flex min-h-[min(60vh,520px)] flex-col lg:order-2 lg:h-full lg:min-h-0">
+        <section className="order-1 flex min-h-[min(60vh,520px)] flex-col lg:order-2 lg:h-full lg:min-h-0 lg:pr-6">
           <ProjectChatSection
             activeModel={effectiveChatModel}
             initialMessages={chatLines}
@@ -116,15 +112,6 @@ export default async function ProjectPage({
             projectId={project.id}
           />
         </section>
-
-        <div className="order-3 min-h-0 lg:overflow-hidden">
-          <ProjectSettingsAside
-            activePhaseId={activePhaseId}
-            exportMd={exportMd}
-            exportYaml={exportYaml}
-            project={project}
-          />
-        </div>
       </div>
     </div>
   );
