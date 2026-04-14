@@ -12,7 +12,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "sync": "tsx src/sync-plan.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "commitlint": "commitlint --edit",

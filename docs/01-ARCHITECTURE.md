@@ -65,7 +65,7 @@ Replace ad-hoc chat + manual YAML editing with a **single web app**: authenticat
 
 - **Auth.js** — session in DB; middleware protects `/app/*` routes.
 - **AI orchestration** — server-only calls to OpenAI; prompts enforce YAML schema aligned with `plans/example.plan.yaml`.
-- **Bitrix sync** — reuse logic from `src/sync-plan.ts` (or extract shared module) invoked with env + per-project overrides for `Bitrix24_Project_id`, `Task_owner_id`, `Task_Assignee_id`.
+- **Bitrix sync** — `src/server/bitrix/*` invoked with `Webhook_URL` from env and per-project IDs from the database.
 
 ### Database (Neon + Prisma)
 
@@ -108,7 +108,7 @@ src/
     lib/                  # logger, env, utils
     config/               # constants
   server/                 # optional: services only used on server
-plans/                    # existing CLI plans (unchanged contract)
+plans/                    # example plans / YAML contract reference
 prisma/
   schema.prisma
 ```
@@ -134,9 +134,9 @@ prisma/
 
 ### Sync to Bitrix
 
-1. Build temporary YAML or in-memory structure matching existing `Plan` type in `sync-plan.ts`.
-2. Set process env for webhook + project/owner/assignee from DB + Vercel secrets.
-3. Run sync function (dry-run optional); record result in DB or flash message.
+1. Load latest plan snapshot from DB (validated `Plan` / YAML-shaped JSON).
+2. Resolve webhook from server env; project/group and task actors from project settings in DB.
+3. Run `runSyncPlan` (dry-run optional); record result in DB or flash message.
 
 ---
 

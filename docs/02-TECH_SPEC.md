@@ -11,10 +11,10 @@
 1. Provide a **hosted** (Vercel) application for the whole team.
 2. **Authenticate** users (Auth.js); persist **projects**, **phases**, **chat history**, and **plan state**.
 3. Use **AI** (OpenAI, server-side) to generate and refine task plans matching the existing **YAML contract** (`epic_mode`, `epics`, tasks with `title` / `description`).
-4. Allow **per-project** Bitrix parameters: `Bitrix24_Project_id`, `Task_owner_id`, `Task_Assignee_id`.
+4. Allow **per-project** Bitrix parameters stored in the database (`bitrixProjectId`, `taskOwnerId`, `taskAssigneeId`).
 5. Keep **webhook** and **OpenAI API key** as deployment secrets (not stored per row in UI as plain text for webhook).
 6. **Export** a single **Markdown** file for developers (VS Code workflow).
-7. **Sync to Bitrix** via existing REST webhook flow (reuse `src/sync-plan.ts` semantics).
+7. **Sync to Bitrix** via existing REST webhook flow (`src/server/bitrix/*`, same YAML/plan contract as `plans/example.plan.yaml`).
 
 ---
 
@@ -84,8 +84,8 @@
 
 ### 3.7 Bitrix sync
 
-- Reuse parsing and API calls from `src/sync-plan.ts`.
-- Environment: `Webhook_URL` from Vercel; project settings override `Bitrix24_Project_id`, `Task_owner_id`, `Task_Assignee_id` for that run.
+- Reuse parsing and API calls from `src/server/bitrix/*`.
+- Environment: `Webhook_URL` on the server; per-project Bitrix IDs from the database for each sync run.
 - Log outcome (success counts / errors) for user feedback.
 
 ---
@@ -123,6 +123,6 @@
 
 | Spec section | Implementation artifact |
 |--------------|---------------------------|
-| YAML contract | `plans/example.plan.yaml`, `src/sync-plan.ts` types |
+| YAML contract | `plans/example.plan.yaml`, `src/shared/domain/plan.ts` |
 | Workflow | `.cursor/rules/bitrix24-workflow.mdc` |
 | Stack | `docs/TECH_CARD.md` |

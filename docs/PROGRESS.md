@@ -43,7 +43,7 @@
 - [x] Phases: list, create, scope chat/plan/export/sync by `?phase=`
 - [x] AI chat + validated plan JSON + snapshots (OpenAI server-side)
 - [x] Plan editor (JSON) + Markdown/YAML export routes
-- [x] Bitrix sync (dry-run + live) reusing `src/server/bitrix/*`; CLI `src/sync-plan.ts` refactored
+- [x] Bitrix sync (dry-run + live) via `src/server/bitrix/*` from the web app
 - [x] Optional Upstash rate limit for chat/sync (`UPSTASH_*`)
 - [x] Vitest unit test, Playwright smoke, GitHub Actions CI
 
