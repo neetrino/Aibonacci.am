@@ -7,11 +7,14 @@ import {
   type PlanPayload,
 } from '@/shared/domain/plan';
 import { savePlanSnapshot } from '@/features/plan-editor/plan-actions';
+import { setPlanTaskSyncSelected } from '@/features/bitrix-sync/plan-sync-actions';
 import {
   buildFlatPlanTasks,
   filterFlatPlanTasks,
   groupRowsByEpicOrder,
+  isTaskSyncChecked,
   updateTaskInPlan,
+  updateTaskSyncInPlan,
   type FlatPlanTaskRow,
 } from '@/features/projects/plan-tasks-iterate';
 import { PlanTasksFullscreenModal } from '@/features/projects/PlanTasksFullscreenModal';
@@ -21,24 +24,6 @@ import {
   WORKSPACE_GHOST_BTN_CLASS,
   WORKSPACE_PANEL_CLASS,
 } from '@/shared/ui/workspace-ui';
-
-function SizeBadge({ size }: { size: FlatPlanTaskRow['task']['size'] }) {
-  if (!size) return null;
-  return (
-    <span
-      className="shrink-0 rounded border border-white/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400"
-      title={
-        size === 'small'
-          ? 'Small — sub-step / short task'
-          : size === 'medium'
-            ? 'Medium — feature-sized'
-            : 'Large — milestone or major work'
-      }
-    >
-      {size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L'}
-    </span>
-  );
-}
 
 type EditingTarget = { epicIndex: number; taskIndex: number };
 
@@ -59,6 +44,7 @@ export function PlanTasksPanelClient({
   const [draftTitle, setDraftTitle] = useState('');
   const [draftDescription, setDraftDescription] = useState('');
   const [saveNote, setSaveNote] = useState<string | null>(null);
+  const [syncNote, setSyncNote] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -105,6 +91,31 @@ export function PlanTasksPanelClient({
       router.refresh();
     });
   }, [draftDescription, draftTitle, editing, phaseId, plan, projectId, router]);
+
+  const toggleRowBitrixSync = useCallback(
+    (row: FlatPlanTaskRow) => {
+      const nextSelected = !isTaskSyncChecked(row.task);
+      setSyncNote(null);
+      startTransition(async () => {
+        const res = await setPlanTaskSyncSelected(
+          projectId,
+          phaseId,
+          row.epicIndex,
+          row.taskIndex,
+          nextSelected,
+        );
+        if ('error' in res && res.error) {
+          setSyncNote(res.error);
+          return;
+        }
+        setPlan((p) =>
+          updateTaskSyncInPlan(p, row.epicIndex, row.taskIndex, nextSelected),
+        );
+        router.refresh();
+      });
+    },
+    [phaseId, projectId, router],
+  );
 
   return (
     <div className={`flex h-full min-h-0 flex-col ${WORKSPACE_PANEL_CLASS}`}>
@@ -164,6 +175,7 @@ export function PlanTasksPanelClient({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
         {saveNote ? <p className="mb-2 text-xs text-red-400">{saveNote}</p> : null}
+        {syncNote ? <p className="mb-2 text-xs text-red-400">{syncNote}</p> : null}
         <ul className="space-y-5">
           {grouped.map(({ epic, epicIndex, rows }) => (
             <li key={`epic-${epicIndex}`}>
@@ -212,18 +224,49 @@ export function PlanTasksPanelClient({
                           </div>
                         </div>
                       ) : (
-                        <>
+                        <div
+                          aria-pressed={isTaskSyncChecked(row.task)}
+                          className={`rounded-lg border px-2 py-1.5 outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-500/40 ${
+                            isTaskSyncChecked(row.task)
+                              ? 'cursor-pointer border-emerald-500/40 bg-emerald-500/[0.12] hover:bg-emerald-500/[0.16]'
+                              : 'cursor-pointer border-white/[0.08] bg-slate-900/50 hover:bg-slate-800/60'
+                          } ${pending ? 'pointer-events-none opacity-70' : ''}`}
+                          onClick={() => toggleRowBitrixSync(row)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              toggleRowBitrixSync(row);
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          title={
+                            isTaskSyncChecked(row.task)
+                              ? 'Selected for Bitrix sync — click to exclude'
+                              : 'Not selected for Bitrix sync — click to include'
+                          }
+                        >
                           <div className="flex flex-wrap items-start justify-between gap-2">
                             <p className="flex min-w-0 flex-1 flex-wrap items-baseline gap-2 text-sm text-slate-200">
-                              <span className="shrink-0 font-mono text-[10px] font-medium text-slate-500">
-                                #{row.displayNumber}
+                              <span className="shrink-0 tabular-nums font-mono text-[10px] font-medium text-slate-500">
+                                {row.displayNumber}
                               </span>
-                              <SizeBadge size={row.task.size} />
+                              {row.task.bitrixSynced ? (
+                                <span
+                                  className="shrink-0 rounded border border-emerald-500/35 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-300/95"
+                                  title="This task was pushed to Bitrix"
+                                >
+                                  Bitrix
+                                </span>
+                              ) : null}
                               <span className="min-w-0">{row.task.title}</span>
                             </p>
                             <button
                               className="shrink-0 rounded border border-white/12 px-2 py-0.5 text-[10px] font-medium text-slate-400 transition hover:border-white/20 hover:text-slate-200"
-                              onClick={() => beginEdit(row)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                beginEdit(row);
+                              }}
                               type="button"
                             >
                               Edit
@@ -234,7 +277,7 @@ export function PlanTasksPanelClient({
                               {row.task.description}
                             </p>
                           ) : null}
-                        </>
+                        </div>
                       )}
                     </li>
                   );

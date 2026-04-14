@@ -5,30 +5,13 @@ import { createPortal } from 'react-dom';
 import type { PlanPayload } from '@/shared/domain/plan';
 import { buildFlatPlanTasks, type FlatPlanTaskRow } from '@/features/projects/plan-tasks-iterate';
 
-function SizeBadge({ size }: { size: FlatPlanTaskRow['task']['size'] }) {
-  if (!size) return null;
-  return (
-    <span
-      className="shrink-0 rounded border border-white/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400"
-      title={
-        size === 'small'
-          ? 'Small — sub-step / short task'
-          : size === 'medium'
-            ? 'Medium — feature-sized'
-            : 'Large — milestone or major work'
-      }
-    >
-      {size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L'}
-    </span>
-  );
-}
-
 function TaskGridCard({ row }: { row: FlatPlanTaskRow }) {
   return (
     <div className="rounded-xl border border-white/10 bg-slate-950/60 p-3 shadow-sm">
       <div className="flex flex-wrap items-baseline gap-2">
-        <span className="shrink-0 font-mono text-[10px] font-medium text-slate-500">#{row.displayNumber}</span>
-        <SizeBadge size={row.task.size} />
+        <span className="shrink-0 tabular-nums font-mono text-[10px] font-medium text-slate-500">
+          {row.displayNumber}
+        </span>
         <span className="min-w-0 flex-1 text-sm leading-snug text-slate-100">{row.task.title}</span>
       </div>
       {row.task.description ? (
