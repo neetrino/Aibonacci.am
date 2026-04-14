@@ -77,3 +77,14 @@ export async function addTask(
 ): Promise<TaskAddResult> {
   return bitrixCall<TaskAddResult>(webhook, 'tasks.task.add', { fields });
 }
+
+export async function updateTask(
+  webhook: string,
+  taskId: number,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  await bitrixCall<unknown>(webhook, 'tasks.task.update', {
+    taskId,
+    fields,
+  });
+}

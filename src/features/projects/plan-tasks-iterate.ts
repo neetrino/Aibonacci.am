@@ -9,6 +9,12 @@ export type FlatPlanTaskRow = {
   task: TaskPayload;
 };
 
+/** Checkbox state for Bitrix sync (respects legacy snapshots without explicit flags). */
+export function isTaskSyncChecked(task: TaskPayload): boolean {
+  if (task.syncSelected !== undefined) return task.syncSelected;
+  return !task.bitrixSynced;
+}
+
 /** Linear order: epic order, then task order within each epic. Display numbers are 1…N for dashboard UI only. */
 export function buildFlatPlanTasks(plan: PlanPayload): FlatPlanTaskRow[] {
   let displayNumber = 0;
@@ -65,6 +71,22 @@ export function groupRowsByEpicOrder(
   return result;
 }
 
+export function updateTaskSyncInPlan(
+  plan: PlanPayload,
+  epicIndex: number,
+  taskIndex: number,
+  syncSelected: boolean,
+): PlanPayload {
+  const epics = plan.epics.map((epic, ei) => {
+    if (ei !== epicIndex) return epic;
+    const tasks = epic.tasks.map((t, ti) =>
+      ti === taskIndex ? { ...t, syncSelected } : t,
+    );
+    return { ...epic, tasks };
+  });
+  return { ...plan, epics };
+}
+
 export function updateTaskInPlan(
   plan: PlanPayload,
   epicIndex: number,
@@ -78,9 +100,12 @@ export function updateTaskInPlan(
     if (ei !== epicIndex) return epic;
     const tasks = epic.tasks.map((t, ti) => {
       if (ti !== taskIndex) return t;
-      const next: TaskPayload = { title: trimmedTitle };
-      if (trimmedDesc) next.description = trimmedDesc;
-      if (t.size) next.size = t.size;
+      const next: TaskPayload = { ...t, title: trimmedTitle };
+      if (trimmedDesc) {
+        next.description = trimmedDesc;
+      } else {
+        delete next.description;
+      }
       return next;
     });
     return { ...epic, tasks };

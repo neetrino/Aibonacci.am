@@ -3,12 +3,17 @@ export type TaskSpec = {
   description?: string;
   /** Granularity for planning / export; not sent as a Bitrix field by default. */
   size?: 'small' | 'medium' | 'large';
+  syncSelected?: boolean;
+  bitrixSynced?: boolean;
+  bitrixTaskId?: number;
 };
 
 export type EpicSpec = {
   name: string;
   description?: string;
   tasks: TaskSpec[];
+  bitrixEpicId?: number;
+  bitrixParentTaskId?: number;
 };
 
 export type Plan = {

@@ -4,6 +4,26 @@ function isRecord(x: unknown): x is Record<string, unknown> {
   return typeof x === 'object' && x !== null && !Array.isArray(x);
 }
 
+function parseOptionalFiniteNumber(
+  raw: unknown,
+  path: string,
+  field: string,
+): number | undefined {
+  if (raw === undefined) return undefined;
+  if (typeof raw !== 'number' || !Number.isFinite(raw)) {
+    throw new Error(`${path}: ${field} must be a finite number`);
+  }
+  return raw;
+}
+
+function parseOptionalBoolean(raw: unknown, path: string, field: string): boolean | undefined {
+  if (raw === undefined) return undefined;
+  if (typeof raw !== 'boolean') {
+    throw new Error(`${path}: ${field} must be a boolean`);
+  }
+  return raw;
+}
+
 function parseTaskSpec(x: unknown, epicPath: string, index: number): TaskSpec {
   if (!isRecord(x)) throw new Error(`${epicPath}: tasks[${index}] must be an object`);
   const title = x.title;
@@ -23,8 +43,16 @@ function parseTaskSpec(x: unknown, epicPath: string, index: number): TaskSpec {
   ) {
     throw new Error(`${epicPath}: tasks[${index}].size must be small, medium, or large`);
   }
-  const trimmed = { title: title.trim(), description: description?.trim() };
-  return size !== undefined ? { ...trimmed, size } : trimmed;
+  const path = `${epicPath}: tasks[${index}]`;
+  const syncSelected = parseOptionalBoolean(x.syncSelected, path, 'syncSelected');
+  const bitrixSynced = parseOptionalBoolean(x.bitrixSynced, path, 'bitrixSynced');
+  const bitrixTaskId = parseOptionalFiniteNumber(x.bitrixTaskId, path, 'bitrixTaskId');
+  const trimmed: TaskSpec = { title: title.trim(), description: description?.trim() };
+  if (size !== undefined) trimmed.size = size;
+  if (syncSelected !== undefined) trimmed.syncSelected = syncSelected;
+  if (bitrixSynced !== undefined) trimmed.bitrixSynced = bitrixSynced;
+  if (bitrixTaskId !== undefined) trimmed.bitrixTaskId = bitrixTaskId;
+  return trimmed;
 }
 
 function parseEpicSpec(x: unknown, index: number): EpicSpec {
@@ -43,7 +71,16 @@ function parseEpicSpec(x: unknown, index: number): EpicSpec {
   if (description !== undefined && typeof description !== 'string') {
     throw new Error(`${path}.description must be a string`);
   }
-  return { name: name.trim(), description: description?.trim(), tasks };
+  const bitrixEpicId = parseOptionalFiniteNumber(x.bitrixEpicId, path, 'bitrixEpicId');
+  const bitrixParentTaskId = parseOptionalFiniteNumber(
+    x.bitrixParentTaskId,
+    path,
+    'bitrixParentTaskId',
+  );
+  const epic: EpicSpec = { name: name.trim(), description: description?.trim(), tasks };
+  if (bitrixEpicId !== undefined) epic.bitrixEpicId = bitrixEpicId;
+  if (bitrixParentTaskId !== undefined) epic.bitrixParentTaskId = bitrixParentTaskId;
+  return epic;
 }
 
 export function parsePlan(raw: unknown): Plan {

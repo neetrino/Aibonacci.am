@@ -26,12 +26,21 @@ export const taskSpecSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
   size: taskSizeSchema.optional(),
+  /** When true, this task is included in the next Bitrix sync. */
+  syncSelected: z.boolean().optional(),
+  /** Set after a successful push to Bitrix. */
+  bitrixSynced: z.boolean().optional(),
+  bitrixTaskId: z.number().finite().optional(),
 });
 
 export const epicSpecSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   tasks: z.array(taskSpecSchema).min(1),
+  /** Scrum: reuse this epic in Bitrix on subsequent syncs. */
+  bitrixEpicId: z.number().finite().optional(),
+  /** parent_tasks mode: reuse this parent task in Bitrix. */
+  bitrixParentTaskId: z.number().finite().optional(),
 });
 
 export const planSchema = z.object({
@@ -80,6 +89,55 @@ function isValidPriorEpics(prior: PlanPayload | undefined): prior is PlanPayload
   );
 }
 
+function applyTaskBitrixDefaults(task: TaskPayload): TaskPayload {
+  const bitrixSynced = task.bitrixSynced ?? false;
+  const syncSelected = task.syncSelected ?? !bitrixSynced;
+  return { ...task, bitrixSynced, syncSelected };
+}
+
+/** Preserves Bitrix metadata from prior snapshot; index-based matching only. */
+function mergeBitrixMetadataFromPrior(plan: PlanPayload, prior: PlanPayload | undefined): PlanPayload {
+  if (!prior?.epics?.length) {
+    return {
+      ...plan,
+      epics: plan.epics.map((epic) => ({
+        ...epic,
+        tasks: epic.tasks.map((t) => applyTaskBitrixDefaults(t)),
+      })),
+    };
+  }
+
+  const epics = plan.epics.map((epic, epicIndex) => {
+    const priorEpic = prior.epics[epicIndex];
+    const epicMerged: EpicPayload = { ...epic };
+    if (priorEpic?.bitrixEpicId !== undefined) {
+      epicMerged.bitrixEpicId = priorEpic.bitrixEpicId;
+    }
+    if (priorEpic?.bitrixParentTaskId !== undefined) {
+      epicMerged.bitrixParentTaskId = priorEpic.bitrixParentTaskId;
+    }
+    epicMerged.tasks = epic.tasks.map((task, taskIndex) => {
+      const priorTask = priorEpic?.tasks[taskIndex];
+      const next: TaskPayload = { ...task };
+      if (priorTask) {
+        if (priorTask.bitrixTaskId !== undefined) {
+          next.bitrixTaskId = priorTask.bitrixTaskId;
+        }
+        if (priorTask.bitrixSynced !== undefined) {
+          next.bitrixSynced = priorTask.bitrixSynced;
+        }
+        if (priorTask.syncSelected !== undefined) {
+          next.syncSelected = priorTask.syncSelected;
+        }
+      }
+      return applyTaskBitrixDefaults(next);
+    });
+    return epicMerged;
+  });
+
+  return { ...plan, epics };
+}
+
 /**
  * Coerces a model-produced plan into a valid {@link PlanPayload}.
  * Fills missing `epic_mode`, empty epics/tasks, and fixes invalid task titles so chat does not fail on vague or greeting-only messages.
@@ -88,12 +146,17 @@ export function normalizePlanFromAi(planRaw: unknown, prior: PlanPayload | undef
   const fallbackEpics = isValidPriorEpics(prior) ? prior.epics : DEFAULT_PLAN.epics;
 
   if (!planRaw || typeof planRaw !== 'object') {
-    return planSchema.parse({
-      epic_mode: 'scrum',
-      decomposition_level: prior?.decomposition_level,
-      decomposition_estimate_note: prior?.decomposition_estimate_note,
-      epics: fallbackEpics,
-    });
+    return planSchema.parse(
+      mergeBitrixMetadataFromPrior(
+        {
+          epic_mode: 'scrum',
+          decomposition_level: prior?.decomposition_level,
+          decomposition_estimate_note: prior?.decomposition_estimate_note,
+          epics: fallbackEpics,
+        },
+        prior,
+      ),
+    );
   }
 
   const o = planRaw as Record<string, unknown>;
@@ -113,14 +176,19 @@ export function normalizePlanFromAi(planRaw: unknown, prior: PlanPayload | undef
 
   const epicsRaw = o.epics;
   if (!Array.isArray(epicsRaw) || epicsRaw.length === 0) {
-    return planSchema.parse({
-      epic_mode,
-      project_title,
-      responsible_id,
-      decomposition_level,
-      decomposition_estimate_note,
-      epics: fallbackEpics,
-    });
+    return planSchema.parse(
+      mergeBitrixMetadataFromPrior(
+        {
+          epic_mode,
+          project_title,
+          responsible_id,
+          decomposition_level,
+          decomposition_estimate_note,
+          epics: fallbackEpics,
+        },
+        prior,
+      ),
+    );
   }
 
   const epics = epicsRaw.map((epicRaw, epicIndex) => {
@@ -162,14 +230,19 @@ export function normalizePlanFromAi(planRaw: unknown, prior: PlanPayload | undef
     return { name, description, tasks };
   });
 
-  return planSchema.parse({
-    epic_mode,
-    project_title,
-    responsible_id,
-    decomposition_level,
-    decomposition_estimate_note,
-    epics,
-  });
+  return planSchema.parse(
+    mergeBitrixMetadataFromPrior(
+      {
+        epic_mode,
+        project_title,
+        responsible_id,
+        decomposition_level,
+        decomposition_estimate_note,
+        epics,
+      },
+      prior,
+    ),
+  );
 }
 
 export const DEFAULT_PLAN: PlanPayload = {
@@ -177,7 +250,14 @@ export const DEFAULT_PLAN: PlanPayload = {
   epics: [
     {
       name: 'Backlog',
-      tasks: [{ title: 'First task', description: 'Describe the outcome' }],
+      tasks: [
+        {
+          title: 'First task',
+          description: 'Describe the outcome',
+          syncSelected: true,
+          bitrixSynced: false,
+        },
+      ],
     },
   ],
 };

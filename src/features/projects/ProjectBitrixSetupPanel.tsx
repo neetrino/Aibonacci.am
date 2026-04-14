@@ -23,7 +23,6 @@ type ProjectForSettings = {
   bitrixProjectId: string | null;
   taskOwnerId: string | null;
   taskAssigneeId: string | null;
-  bitrixSyncCompleted: boolean;
 };
 
 export function ProjectBitrixSetupPanel({
@@ -87,11 +86,7 @@ export function ProjectBitrixSetupPanel({
           <div className="border-t border-white/10 pt-4">
             <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>Push tasks to Bitrix (uses webhook).</p>
             <div className="mt-3">
-              <SyncToolbar
-                bitrixSyncCompleted={project.bitrixSyncCompleted}
-                phaseId={activePhaseId}
-                projectId={project.id}
-              />
+              <SyncToolbar phaseId={activePhaseId} projectId={project.id} />
             </div>
           </div>
         </div>
