@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChatComposer } from '@/features/chat/ChatComposer';
-import { ProjectChatWorkspace } from '@/features/chat/ProjectChatWorkspace';
+import { ProjectChatSection } from '@/features/chat/ProjectChatSection';
 import { PhasePills } from '@/features/phases/PhasePills';
 import { PlanTasksPanel } from '@/features/projects/PlanTasksPanel';
 import { ProjectSettingsAside } from '@/features/projects/ProjectSettingsAside';
@@ -89,7 +88,8 @@ export default async function ProjectPage({
           </h1>
         </div>
         <p className={`max-w-xl ${WORKSPACE_BODY_CLASS} text-xs sm:text-sm`}>
-          Center: chat. Left: AI plan tasks. Right: one-time setup (model, Bitrix, export).
+          Center: chat. Left: AI plan tasks. Right: Bitrix and export. AI model and plan JSON live in My
+          account.
         </p>
       </header>
 
@@ -109,15 +109,11 @@ export default async function ProjectPage({
         </aside>
 
         <section className="order-1 flex min-h-[min(60vh,520px)] flex-col lg:order-2 lg:h-full lg:min-h-0">
-          <ProjectChatWorkspace
-            composer={
-              <ChatComposer
-                activeModel={effectiveChatModel}
-                phaseId={activePhaseId}
-                projectId={project.id}
-              />
-            }
-            messages={chatLines}
+          <ProjectChatSection
+            activeModel={effectiveChatModel}
+            initialMessages={chatLines}
+            phaseId={activePhaseId}
+            projectId={project.id}
           />
         </section>
 
@@ -126,7 +122,6 @@ export default async function ProjectPage({
             activePhaseId={activePhaseId}
             exportMd={exportMd}
             exportYaml={exportYaml}
-            plan={plan}
             project={project}
           />
         </div>

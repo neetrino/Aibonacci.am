@@ -56,4 +56,5 @@ export async function savePlanSnapshot(
   });
 
   revalidatePath(`/app/projects/${project.slug}`);
+  revalidatePath('/app/account');
 }

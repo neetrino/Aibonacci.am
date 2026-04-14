@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { AiShell } from '@/features/marketing/AiShell';
-import { signOutAction } from '@/features/auth/auth-actions';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await auth();
@@ -24,15 +23,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             >
               Home
             </Link>
-          </div>
-          <form action={signOutAction}>
-            <button
-              className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-slate-200 transition hover:border-white/25 hover:bg-white/10"
-              type="submit"
+            <Link
+              className="text-sm text-violet-200/80 transition hover:text-white"
+              href="/app/account"
             >
-              Sign out
-            </button>
-          </form>
+              My account
+            </Link>
+          </div>
         </div>
       </header>
       <div className="mx-auto w-full max-w-[1600px] flex-1 px-6 py-8">{children}</div>

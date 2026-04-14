@@ -1,6 +1,8 @@
 export type TaskSpec = {
   title: string;
   description?: string;
+  /** Granularity for planning / export; not sent as a Bitrix field by default. */
+  size?: 'small' | 'medium' | 'large';
 };
 
 export type EpicSpec = {
@@ -13,6 +15,7 @@ export type Plan = {
   project_title?: string;
   epic_mode: 'scrum' | 'parent_tasks';
   responsible_id?: number;
+  decomposition_level?: 'coarse' | 'balanced' | 'fine';
   epics: EpicSpec[];
 };
 

@@ -30,4 +30,5 @@ export async function updateProjectChatModel(projectId: string, formData: FormDa
     data: { openaiChatModel: trimmed },
   });
   revalidatePath(`/app/projects/${project.slug}`);
+  revalidatePath('/app/account');
 }

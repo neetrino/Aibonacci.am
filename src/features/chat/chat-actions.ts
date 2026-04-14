@@ -1,20 +1,14 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
 import { PLAN_SYSTEM_PROMPT } from '@/features/chat/prompts';
-import { planSchema, type PlanPayload } from '@/shared/domain/plan';
+import { normalizePlanFromAi, type PlanPayload } from '@/shared/domain/plan';
 import { getOpenAI } from '@/shared/lib/openai';
 import { logger } from '@/shared/lib/logger';
 import { prisma } from '@/shared/lib/prisma';
 import { getEffectiveChatModel } from '@/shared/lib/openai-model';
 import { enforceRateLimit } from '@/shared/lib/rate-limit';
 import { requireActiveUserId } from '@/shared/lib/session';
-
-const chatResponseSchema = z.object({
-  assistant_message: z.string(),
-  plan: planSchema,
-});
 
 export async function sendChatMessage(
   projectId: string,
@@ -42,6 +36,8 @@ export async function sendChatMessage(
   if (!project) {
     return { error: 'Project not found' };
   }
+
+  const revalidateProject = () => revalidatePath(`/app/projects/${project.slug}`);
 
   if (phaseId) {
     const phase = await prisma.phase.findFirst({
@@ -97,30 +93,54 @@ export async function sendChatMessage(
     });
     const content = completion.choices[0]?.message?.content;
     if (!content) {
+      revalidateProject();
       return { error: 'Empty AI response' };
     }
     rawJson = JSON.parse(content) as unknown;
   } catch (e) {
     logger.error({ err: e, projectId }, 'OpenAI chat failed');
+    revalidateProject();
     return { error: 'AI request failed. Check OpenAI_API_Key and try again.' };
   }
 
-  let parsed: z.infer<typeof chatResponseSchema>;
-  try {
-    parsed = chatResponseSchema.parse(rawJson);
-  } catch (e) {
-    logger.warn({ err: e, rawJson }, 'AI plan JSON validation failed');
+  if (!rawJson || typeof rawJson !== 'object') {
+    logger.warn({ rawJson }, 'AI chat JSON was not an object');
+    revalidateProject();
     return { error: 'AI returned an invalid plan. Try rephrasing your message.' };
   }
 
-  const plan = parsed.plan;
+  const body = rawJson as Record<string, unknown>;
+  const rawAssistant = body.assistant_message;
+  let assistant_message =
+    typeof rawAssistant === 'string' && rawAssistant.trim()
+      ? rawAssistant.trim()
+      : 'Describe your goal when you are ready — I will turn it into epics and tasks.';
+
+  const rawQuestions = body.open_questions;
+  if (Array.isArray(rawQuestions) && rawQuestions.length > 0) {
+    const questions = rawQuestions
+      .filter((q): q is string => typeof q === 'string' && q.trim().length > 0)
+      .map((q) => q.trim());
+    if (questions.length > 0) {
+      assistant_message = `${assistant_message}\n\n**Open questions**\n${questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}`;
+    }
+  }
+
+  let plan: PlanPayload;
+  try {
+    plan = normalizePlanFromAi(body.plan, priorPlan);
+  } catch (e) {
+    logger.warn({ err: e, rawJson }, 'AI plan normalization failed');
+    revalidateProject();
+    return { error: 'AI returned an invalid plan. Try rephrasing your message.' };
+  }
 
   await prisma.message.create({
     data: {
       projectId,
       phaseId,
       role: 'assistant',
-      content: parsed.assistant_message,
+      content: assistant_message,
     },
   });
 
@@ -133,5 +153,5 @@ export async function sendChatMessage(
     },
   });
 
-  revalidatePath(`/app/projects/${project.slug}`);
+  revalidateProject();
 }

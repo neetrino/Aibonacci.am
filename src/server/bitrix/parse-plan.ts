@@ -14,7 +14,17 @@ function parseTaskSpec(x: unknown, epicPath: string, index: number): TaskSpec {
   if (description !== undefined && typeof description !== 'string') {
     throw new Error(`${epicPath}: tasks[${index}].description must be a string`);
   }
-  return { title: title.trim(), description: description?.trim() };
+  const size = x.size;
+  if (
+    size !== undefined &&
+    size !== 'small' &&
+    size !== 'medium' &&
+    size !== 'large'
+  ) {
+    throw new Error(`${epicPath}: tasks[${index}].size must be small, medium, or large`);
+  }
+  const trimmed = { title: title.trim(), description: description?.trim() };
+  return size !== undefined ? { ...trimmed, size } : trimmed;
 }
 
 function parseEpicSpec(x: unknown, index: number): EpicSpec {
@@ -55,10 +65,20 @@ export function parsePlan(raw: unknown): Plan {
   if (responsible_id !== undefined && typeof responsible_id !== 'number') {
     throw new Error('responsible_id must be a number');
   }
+  const decomposition_level = raw.decomposition_level;
+  if (
+    decomposition_level !== undefined &&
+    decomposition_level !== 'coarse' &&
+    decomposition_level !== 'balanced' &&
+    decomposition_level !== 'fine'
+  ) {
+    throw new Error('decomposition_level must be coarse, balanced, or fine');
+  }
   return {
     project_title: project_title?.trim(),
     epic_mode: mode,
     responsible_id,
+    ...(decomposition_level !== undefined ? { decomposition_level } : {}),
     epics,
   };
 }

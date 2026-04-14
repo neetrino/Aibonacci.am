@@ -13,3 +13,21 @@ export async function getProjectForUser(slug: string, userId: string) {
     where: { slug, ownerId: userId },
   });
 }
+
+/** Projects with phases for /app/account (AI model + plan JSON are scoped per project/phase). */
+export async function listProjectsWithPhasesForAccount(userId: string) {
+  return prisma.project.findMany({
+    where: { ownerId: userId },
+    orderBy: { updatedAt: 'desc' },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      openaiChatModel: true,
+      phases: {
+        orderBy: { sortOrder: 'asc' },
+        select: { id: true, label: true },
+      },
+    },
+  });
+}
