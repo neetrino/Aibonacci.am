@@ -1,6 +1,6 @@
 # Bitrix24: план → задачи в проекте
 
-**Сначала** черновик в **`plans/*.md`** (удобно читать), шаблон — `plans/example.plan.md`. **После согласования** — перенос в **`plans/*.yaml`** (шаблон `plans/example.plan.yaml`) и синхронизация с Bitrix. Смена проекта: только **`Bitrix24_Project_id`** в `.env`; вебхук один. Подробнее — `.cursor/rules/bitrix24-workflow.mdc`.
+**Сначала** черновик в **`plans/*.md`** (удобно читать), шаблон — `plans/example-plan.md` (структура как у обычного `plan.md`: заголовки `##` = эпики, списки = задачи). Файлы вида `*.plan.md` в этом проекте открываются как Markdown — см. `.vscode/settings.json`. **После согласования** — перенос в **`plans/*.yaml`** (`plans/example.plan.yaml`) и синхронизация с Bitrix. Смена проекта: **`Bitrix24_Project_id`** в `.env`. Подробнее — `.cursor/rules/bitrix24-workflow.mdc`.
 
 ## `.env`
 
@@ -32,7 +32,7 @@ npm run sync -- plans/example.plan.yaml --dry-run
 npm run sync -- plans/example.plan.yaml
 ```
 
-Своё ТЗ — копируйте `example.plan.md` / `example.plan.yaml` в новые файлы и подставьте имя в командах `sync`.
+Своё ТЗ — копируйте `example-plan.md` / `example.plan.yaml` в новые файлы и подставьте имя в командах `sync`.
 
 Поле **`epic_mode`**: `scrum` (эпики API) или `parent_tasks` (родитель + подзадачи), если Scrum/API эпика недоступен.
 

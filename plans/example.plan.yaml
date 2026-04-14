@@ -1,4 +1,4 @@
-# Машинный план после согласования черновика в example.plan.md.
+# Машинный план после согласования черновика (plans/example-plan.md или plan.md).
 # Сухой прогон: npm run sync -- plans/example.plan.yaml --dry-run
 # Заливка:     npm run sync -- plans/example.plan.yaml
 
