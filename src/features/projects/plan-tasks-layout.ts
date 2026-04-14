@@ -11,4 +11,4 @@ export const TASKS_ASIDE_MAX_WIDTH_PX = 364;
  * lg:grid-cols-[minmax(286px,364px)_minmax(0,1fr)]
  */
 export const PROJECT_TASKS_CHAT_GRID_CLASS =
-  'grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(286px,364px)_minmax(0,1fr)] lg:gap-4 lg:overflow-hidden lg:-mx-6';
+  'grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden lg:grid-cols-[minmax(286px,364px)_minmax(0,1fr)] lg:gap-4 lg:-mx-6';

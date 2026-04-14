@@ -173,7 +173,7 @@ export function PlanTasksPanelClient({
         />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+      <div className="scrollbar-workspace-subtle min-h-0 flex-1 overflow-y-auto px-3 py-3">
         {saveNote ? <p className="mb-2 text-xs text-red-400">{saveNote}</p> : null}
         {syncNote ? <p className="mb-2 text-xs text-red-400">{syncNote}</p> : null}
         <ul className="space-y-5">

@@ -76,7 +76,7 @@ export default async function ProjectPage({
   }));
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2">
+    <div className="flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden">
       <header className="flex min-w-0 shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <h1 className="min-w-0 max-w-full shrink-0 truncate text-2xl font-semibold tracking-tight text-white sm:text-3xl">
           {project.name}
@@ -92,13 +92,15 @@ export default async function ProjectPage({
         </div>
       </header>
 
-      <ProjectBitrixSetupPanel
-        activePhaseId={activePhaseId}
-        exportMd={exportMd}
-        exportYaml={exportYaml}
-        layout="edge"
-        project={project}
-      />
+      <div className="shrink-0">
+        <ProjectBitrixSetupPanel
+          activePhaseId={activePhaseId}
+          exportMd={exportMd}
+          exportYaml={exportYaml}
+          layout="edge"
+          project={project}
+        />
+      </div>
 
       <div className={PROJECT_TASKS_CHAT_GRID_CLASS}>
         <aside className="order-2 flex min-h-0 flex-col overflow-hidden lg:order-1 lg:pl-6">
@@ -107,7 +109,7 @@ export default async function ProjectPage({
           </div>
         </aside>
 
-        <section className="order-1 flex min-h-[min(60vh,520px)] flex-col lg:order-2 lg:h-full lg:min-h-0 lg:pr-6">
+        <section className="order-1 flex min-h-0 flex-1 flex-col lg:order-2 lg:h-full lg:min-h-0 lg:pr-6">
           <ProjectChatSection
             activeModel={effectiveChatModel}
             initialMessages={chatLines}

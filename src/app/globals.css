@@ -30,3 +30,40 @@ body {
   animation: home-aurora 14s ease-in-out infinite;
   animation-delay: -7s;
 }
+
+/**
+ * Dark workspace scrollbars: low-contrast thumb, slightly stronger on hover (slate / violet).
+ * Matches app shell; avoids default bright system scrollbar.
+ */
+@layer utilities {
+  .scrollbar-workspace-subtle {
+    --scrollbar-track: transparent;
+    --scrollbar-thumb-idle: rgb(51 65 85 / 0.35);
+    --scrollbar-thumb-hover: rgb(139 92 246 / 0.42);
+    --scrollbar-width-px: 6px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb-idle) var(--scrollbar-track);
+  }
+
+  .scrollbar-workspace-subtle:hover {
+    scrollbar-color: var(--scrollbar-thumb-hover) var(--scrollbar-track);
+  }
+
+  .scrollbar-workspace-subtle::-webkit-scrollbar {
+    width: var(--scrollbar-width-px);
+  }
+
+  .scrollbar-workspace-subtle::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  .scrollbar-workspace-subtle::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: var(--scrollbar-thumb-idle);
+  }
+
+  .scrollbar-workspace-subtle:hover::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-hover);
+  }
+}

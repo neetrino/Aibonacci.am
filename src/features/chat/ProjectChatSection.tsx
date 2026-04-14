@@ -74,7 +74,6 @@ export function ProjectChatSection({
   activeModel,
 }: ProjectChatSectionProps) {
   const router = useRouter();
-  const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const [optimisticMessages, addOptimistic] = useOptimistic(
@@ -92,7 +91,9 @@ export function ProjectChatSection({
   const [pastedDraft, setPastedDraft] = useState('');
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
   }, [optimisticMessages, state, isPending]);
 
   useEffect(() => {
@@ -127,7 +128,10 @@ export function ProjectChatSection({
       className="relative flex h-full min-h-0 flex-1 flex-col"
       onSubmit={handleSubmit}
     >
-      <div className="min-h-0 flex-1 overflow-y-auto" ref={scrollRef}>
+      <div
+        className="scrollbar-workspace-subtle min-h-0 flex-1 overflow-y-auto"
+        ref={scrollRef}
+      >
         <div className={`mx-auto w-full ${CHAT_CONTENT_MAX} px-4 pb-40 pt-2`}>
           {optimisticMessages.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">
@@ -156,7 +160,6 @@ export function ProjectChatSection({
               <AssistantPendingRow pending={isPending} />
             </div>
           )}
-          <div aria-hidden ref={bottomRef} />
         </div>
       </div>
 

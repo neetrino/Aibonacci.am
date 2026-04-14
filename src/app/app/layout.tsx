@@ -10,8 +10,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect('/auth/signin');
   }
   return (
-    <AiShell contentClassName="flex min-h-screen flex-col">
-      <header className="border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
+    <AiShell contentClassName="flex h-dvh min-h-0 flex-col overflow-hidden">
+      <header className="shrink-0 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-8">
             <Link className="font-semibold text-slate-100" href="/app">
@@ -32,7 +32,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <div className="mx-auto w-full max-w-[1600px] flex-1 px-6 py-8">{children}</div>
+      <div className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col overflow-y-auto px-6 py-8">
+        {children}
+      </div>
     </AiShell>
   );
 }
