@@ -19,3 +19,10 @@ export const PROJECT_TASKS_CHAT_GRID_CLASS =
  * does not cover the phase rail.
  */
 export const TASKS_PHASE_RAIL_WIDTH_CLASS = 'lg:w-[clamp(260px,26vw,340px)]';
+
+/** `id` on the All tasks panel — used for outside-close hit testing. */
+export const ALL_TASKS_PANEL_DOM_ID = 'all-tasks-panel';
+
+/** Sidebar Tasks buttons — excluded from All tasks outside-close; same-phase click toggles closed. */
+export const TASK_LIST_TOGGLE_DATA_KEY = 'data-task-list-toggle';
+export const TASK_LIST_TOGGLE_SELECTOR = `[${TASK_LIST_TOGGLE_DATA_KEY}]`;

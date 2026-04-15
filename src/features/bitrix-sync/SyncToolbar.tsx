@@ -7,10 +7,11 @@ import { BitrixSyncConfirmDialog } from '@/features/bitrix-sync/BitrixSyncConfir
 import { syncProjectToBitrix } from '@/features/bitrix-sync/sync-actions';
 import { WORKSPACE_GHOST_BTN_CLASS } from '@/shared/ui/workspace-ui';
 
-const COMPACT_GHOST =
-  'rounded-lg border border-slate-600 bg-slate-800 px-2 py-1 text-xs font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 disabled:opacity-60';
-const COMPACT_PRIMARY =
-  'rounded-lg bg-emerald-600 px-2 py-1 text-xs font-medium text-white transition hover:bg-emerald-500 disabled:opacity-60';
+/** Same as workspace ghost/accent intent; compact padding for All tasks toolbar (no `text-sm` conflict). */
+const COMPACT_GHOST_CLASS =
+  'rounded-lg border border-white/10 bg-neutral-800/80 px-2 py-1 text-xs font-medium text-neutral-200 transition hover:border-white/15 hover:bg-neutral-800 disabled:opacity-60';
+const COMPACT_ACCENT_CLASS =
+  'rounded-lg bg-violet-600 px-2 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-violet-500 disabled:opacity-60';
 
 /** full: both buttons; syncOnly: real sync only (All tasks); dryRunOnly: dry-run only (Bitrix settings modal). */
 export type SyncToolbarVariant = 'full' | 'syncOnly' | 'dryRunOnly';
@@ -30,9 +31,9 @@ export function SyncToolbar({
   const [pending, start] = useTransition();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const ghostClass = compact ? COMPACT_GHOST : WORKSPACE_GHOST_BTN_CLASS;
+  const ghostClass = compact ? COMPACT_GHOST_CLASS : WORKSPACE_GHOST_BTN_CLASS;
   const primaryClass = compact
-    ? COMPACT_PRIMARY
+    ? COMPACT_ACCENT_CLASS
     : 'rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-60';
 
   function run(dryRun: boolean) {

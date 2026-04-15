@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { Phase } from '@prisma/client';
 import { PhaseCreateForm } from '@/features/phases/PhaseCreateForm';
+import { TASK_LIST_TOGGLE_DATA_KEY } from '@/features/projects/plan-tasks-layout';
 import { useProjectPlanTasks } from '@/features/projects/project-plan-tasks-context';
 import { ListChecksGlyph } from '@/shared/ui/brand-icons';
 
@@ -57,6 +58,7 @@ function PhaseChatRow({
           onClick={() => onOpenTasks()}
           title={tasksTitle}
           type="button"
+          {...{ [TASK_LIST_TOGGLE_DATA_KEY]: '' }}
         >
           <ListChecksGlyph className="h-4 w-4 shrink-0 opacity-90" />
           <span>Tasks</span>
