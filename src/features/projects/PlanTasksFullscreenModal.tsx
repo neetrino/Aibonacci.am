@@ -10,15 +10,16 @@ import {
 } from '@/features/projects/plan-tasks-iterate';
 import { SyncToolbar } from '@/features/bitrix-sync/SyncToolbar';
 import { PlanTaskRowCard } from '@/features/projects/PlanTaskRowCard';
+import { TASKS_PHASE_RAIL_WIDTH_CLASS } from '@/features/projects/plan-tasks-layout';
 import { WORKSPACE_FIELD_CLASS, WORKSPACE_GHOST_BTN_CLASS } from '@/shared/ui/workspace-ui';
 
 type EditingTarget = { epicIndex: number; taskIndex: number };
 
 type TasksViewMode = 'grid' | 'list';
 
-/** Left strip (~20% viewport): dim overlay, click closes drawer. */
+/** Dim + click target to close; share of the area to the right of the phase rail (not full viewport). */
 const TASKS_DRAWER_BACKDROP_WIDTH_CLASS = 'w-1/5';
-/** Right panel (~80% viewport): task list; slide-in via `tasks-drawer-panel-enter` in globals.css. */
+/** Task list panel width within that area; slide-in via `tasks-drawer-panel-enter` in globals.css. */
 const TASKS_DRAWER_PANEL_WIDTH_CLASS = 'w-4/5';
 const TASKS_DRAWER_PANEL_ENTER_CLASS = 'tasks-drawer-panel-enter';
 
@@ -105,18 +106,27 @@ export function PlanTasksFullscreenModal({
     <div
       aria-labelledby={titleId}
       aria-modal="true"
-      className="fixed inset-0 z-[100] flex flex-row"
+      className="fixed inset-0 z-[100] flex min-h-0 w-full flex-row"
       role="dialog"
     >
-      <button
-        aria-label="Close dialog"
-        className={`${TASKS_DRAWER_BACKDROP_WIDTH_CLASS} h-dvh shrink-0 cursor-pointer border-0 bg-slate-950/50 p-0 transition-colors hover:bg-slate-950/60`}
-        onClick={onClose}
-        type="button"
-      />
+      {/*
+        On large screens the project phase rail sits on the left; reserve its width so the dimmed
+        layer does not cover it. pointer-events-none so phases/links stay clickable underneath.
+      */}
       <div
-        className={`relative z-[101] flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden rounded-l-2xl border border-slate-700 border-r-0 bg-slate-900 shadow-xl shadow-black/40 ${TASKS_DRAWER_PANEL_WIDTH_CLASS} ${TASKS_DRAWER_PANEL_ENTER_CLASS}`}
-      >
+        aria-hidden
+        className={`pointer-events-none hidden shrink-0 lg:block ${TASKS_PHASE_RAIL_WIDTH_CLASS}`}
+      />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-row">
+        <button
+          aria-label="Close dialog"
+          className={`${TASKS_DRAWER_BACKDROP_WIDTH_CLASS} h-dvh shrink-0 cursor-pointer border-0 bg-slate-950/50 p-0 transition-colors hover:bg-slate-950/60`}
+          onClick={onClose}
+          type="button"
+        />
+        <div
+          className={`relative z-[101] flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden rounded-l-2xl border border-slate-700 border-r-0 bg-slate-900 shadow-xl shadow-black/40 ${TASKS_DRAWER_PANEL_WIDTH_CLASS} ${TASKS_DRAWER_PANEL_ENTER_CLASS}`}
+        >
         <div className="flex shrink-0 flex-col gap-3 border-b border-slate-700 px-4 py-3 sm:px-5">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -236,6 +246,7 @@ export function PlanTasksFullscreenModal({
             </>
           ) : null}
         </div>
+      </div>
       </div>
     </div>
   );
