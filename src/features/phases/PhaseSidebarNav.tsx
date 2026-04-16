@@ -11,24 +11,22 @@ import { useProjectPlanTasks } from '@/features/projects/project-plan-tasks-cont
 import { ListChecksGlyph } from '@/shared/ui/brand-icons';
 
 /** Softer than heavy borders: shift in background (ChatGPT-style thread list). */
+/** py-0 so the row height is driven by the Tasks button, matching its outline thickness. */
 const PHASE_ROW_WRAP_ACTIVE =
-  'rounded-xl border border-white/[0.08] bg-workspace-elevated p-2.5 shadow-none';
+  'rounded-xl border border-white/[0.08] bg-workspace-elevated px-2 py-0 shadow-none';
 const PHASE_ROW_WRAP_IDLE =
-  'rounded-xl border border-transparent p-2.5 transition hover:bg-white/[0.04]';
+  'rounded-xl border border-transparent px-2 py-0 transition hover:bg-white/[0.04]';
 
 const LINK_ACTIVE = 'font-medium text-neutral-100';
 const LINK_IDLE = 'font-medium text-neutral-400 hover:text-neutral-200';
 
-function tasksButtonClass(isRowActive: boolean, isTasksPanelOpen: boolean): string {
+function tasksButtonClass(isTasksPanelOpen: boolean): string {
   const base =
     'flex shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20';
   if (isTasksPanelOpen) {
     return `${base} border-violet-500/40 bg-violet-600 text-white shadow-sm hover:bg-violet-500`;
   }
-  if (isRowActive) {
-    return `${base} border-white/10 bg-neutral-900 text-neutral-100 hover:bg-neutral-950`;
-  }
-  return `${base} border-white/10 bg-workspace-canvas text-neutral-300 hover:border-white/15 hover:bg-neutral-900 hover:text-neutral-100`;
+  return `${base} border-transparent bg-transparent text-neutral-300 hover:border-white/15 hover:bg-neutral-900 hover:text-neutral-100`;
 }
 
 function PhaseChatRow({
@@ -62,14 +60,13 @@ function PhaseChatRow({
         <button
           aria-label={tasksAriaLabel}
           aria-pressed={isTasksPanelOpen}
-          className={tasksButtonClass(isActive, isTasksPanelOpen)}
+          className={tasksButtonClass(isTasksPanelOpen)}
           onClick={() => onOpenTasks()}
           title={tasksTitle}
           type="button"
           {...{ [TASK_LIST_TOGGLE_DATA_KEY]: '' }}
         >
           <ListChecksGlyph className="h-4 w-4 shrink-0 opacity-90" />
-          <span>Tasks</span>
           <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-md bg-neutral-950 px-1 text-[10px] font-bold tabular-nums text-neutral-200 ring-1 ring-white/10">
             {taskCount}
           </span>
