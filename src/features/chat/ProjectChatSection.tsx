@@ -1,17 +1,19 @@
 'use client';
 
 import {
-  useActionState,
+  startTransition,
   useEffect,
   useLayoutEffect,
   useOptimistic,
   useRef,
   useState,
-  useTransition,
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { sendChatMessage } from '@/features/chat/chat-actions';
+import {
+  AssistantPendingRow,
+  SendOrStopControl,
+} from '@/features/chat/ProjectChatComposerControls';
 
 export type ChatMessageLine = {
   id: string;
@@ -28,49 +30,6 @@ const CHAT_INPUT_MAX_HEIGHT_PX = 400;
 /** Covers subpixel / line-height rounding so 2 lines do not falsely show a scrollbar. */
 const CHAT_INPUT_SCROLL_HEIGHT_BUFFER_PX = 4;
 
-function SendControl({ pending }: { pending: boolean }) {
-  return (
-    <button
-      aria-label="Send message"
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-neutral-900 transition hover:bg-white disabled:opacity-50"
-      disabled={pending}
-      type="submit"
-    >
-      {pending ? (
-        <span className="text-xs">…</span>
-      ) : (
-        <svg aria-hidden className="h-5 w-5" fill="none" viewBox="0 0 24 24">
-          <path
-            d="M12 19V5m0 0l-7 7m7-7l7 7"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-          />
-        </svg>
-      )}
-    </button>
-  );
-}
-
-function AssistantPendingRow({ pending }: { pending: boolean }) {
-  if (!pending) return null;
-  return (
-    <div className="text-sm leading-relaxed text-neutral-400">
-      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-        Assistant
-      </span>
-      <span className="inline-flex items-center gap-2">
-        <span
-          aria-hidden
-          className="inline-block h-2 w-2 animate-pulse rounded-full bg-neutral-500"
-        />
-        Updating plan…
-      </span>
-    </div>
-  );
-}
-
 function formatModelLabel(id: string): string {
   if (id.length <= 28) return id;
   return `${id.slice(0, 14)}…${id.slice(-10)}`;
@@ -78,32 +37,33 @@ function formatModelLabel(id: string): string {
 
 type ProjectChatSectionProps = {
   initialMessages: ChatMessageLine[];
-  projectId: string;
+  projectSlug: string;
   phaseId: string | null;
   activeModel: string;
 };
 
+type ChatPostResponseJson = {
+  error?: string;
+  cancelled?: boolean;
+  ok?: boolean;
+};
+
 export function ProjectChatSection({
   initialMessages,
-  projectId,
+  projectSlug,
   phaseId,
   activeModel,
 }: ProjectChatSectionProps) {
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const chatErrorToastedRef = useRef<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const [optimisticMessages, addOptimistic] = useOptimistic(
     initialMessages,
     (state, newMessage: ChatMessageLine) => [...state, newMessage],
   );
 
-  const wrappedAction = async (prev: unknown, formData: FormData) =>
-    sendChatMessage(projectId, phaseId, prev, formData);
-
-  const [state, formAction] = useActionState(wrappedAction, undefined);
-  const [isPending, startTransition] = useTransition();
-
+  const [isSending, setIsSending] = useState(false);
   const [draft, setDraft] = useState('');
   const messageTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -111,18 +71,7 @@ export function ProjectChatSection({
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-  }, [optimisticMessages, state, isPending]);
-
-  useEffect(() => {
-    if (!state?.error) {
-      chatErrorToastedRef.current = null;
-      return;
-    }
-    if (chatErrorToastedRef.current === state.error) return;
-    chatErrorToastedRef.current = state.error;
-    toast.error(state.error);
-    router.refresh();
-  }, [state?.error, router]);
+  }, [optimisticMessages, isSending]);
 
   useLayoutEffect(() => {
     const el = messageTextareaRef.current;
@@ -137,22 +86,65 @@ export function ProjectChatSection({
     el.style.overflowY = el.scrollHeight > el.clientHeight ? 'auto' : 'hidden';
   }, [draft]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleStop = () => {
+    abortRef.current?.abort();
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const message = draft.trim();
-    if (!message) return;
+    if (!message || isSending) return;
 
-    const fd = new FormData();
-    fd.set('message', message);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setIsSending(true);
     setDraft('');
+
     startTransition(() => {
       addOptimistic({
         id: `optimistic-${crypto.randomUUID()}`,
         role: 'user',
         content: message,
       });
-      void formAction(fd);
     });
+
+    const url = `/api/projects/${encodeURIComponent(projectSlug)}/chat`;
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          phaseId,
+        }),
+        signal: controller.signal,
+      });
+
+      const data = (await res.json()) as ChatPostResponseJson;
+
+      if (!res.ok) {
+        toast.error(data.error ?? 'Request failed');
+        router.refresh();
+        return;
+      }
+      if (data.error) {
+        toast.error(data.error);
+        router.refresh();
+        return;
+      }
+      router.refresh();
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        router.refresh();
+        return;
+      }
+      toast.error('Network error');
+      router.refresh();
+    } finally {
+      setIsSending(false);
+      abortRef.current = null;
+    }
   };
 
   return (
@@ -188,7 +180,7 @@ export function ProjectChatSection({
                   </div>
                 ),
               )}
-              <AssistantPendingRow pending={isPending} />
+              <AssistantPendingRow pending={isSending} />
             </div>
           )}
         </div>
@@ -212,7 +204,9 @@ export function ProjectChatSection({
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    e.currentTarget.form?.requestSubmit();
+                    if (!isSending) {
+                      e.currentTarget.form?.requestSubmit();
+                    }
                   }
                 }}
                 placeholder="Describe your goal or paste specs…"
@@ -241,7 +235,7 @@ export function ProjectChatSection({
                     {formatModelLabel(activeModel)}
                   </span>
                   <div className="shrink-0">
-                    <SendControl pending={isPending} />
+                    <SendOrStopControl onStop={handleStop} pending={isSending} />
                   </div>
                 </div>
               </div>
