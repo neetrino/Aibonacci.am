@@ -10,6 +10,7 @@ import {
   updateTaskSyncInPlan,
   type FlatPlanTaskRow,
 } from '@/features/projects/plan-tasks-iterate';
+import { BITRIX_SYNC_CONFIRM_PORTAL_SELECTOR } from '@/features/bitrix-sync/BitrixSyncConfirmDialog';
 import { PlanTasksFullscreenModal } from '@/features/projects/PlanTasksFullscreenModal';
 import {
   ALL_TASKS_PANEL_DOM_ID,
@@ -169,6 +170,7 @@ export function ProjectPlanTasksHost({
       const panel = document.getElementById(ALL_TASKS_PANEL_DOM_ID);
       if (panel?.contains(target)) return;
       if (target instanceof Element && target.closest(TASK_LIST_TOGGLE_SELECTOR)) return;
+      if (target instanceof Element && target.closest(BITRIX_SYNC_CONFIRM_PORTAL_SELECTOR)) return;
       closeModal();
     };
     document.addEventListener('pointerdown', onPointerDownCapture, true);
