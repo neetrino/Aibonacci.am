@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import type { Phase } from '@prisma/client';
 import { PhaseCreateForm } from '@/features/phases/PhaseCreateForm';
 import { TASK_LIST_TOGGLE_DATA_KEY } from '@/features/projects/plan-tasks-layout';
+import { ALL_TASKS_PANEL_QUERY_KEY, buildProjectPageHref } from '@/features/projects/project-plan-tasks-url';
 import { useProjectPlanTasks } from '@/features/projects/project-plan-tasks-context';
 import { ListChecksGlyph } from '@/shared/ui/brand-icons';
 
@@ -89,38 +91,15 @@ export function PhaseSidebarNav({
 }) {
   const [addOpen, setAddOpen] = useState(false);
   const { openTasksForPhase } = useProjectPlanTasks();
+  const searchParams = useSearchParams();
+  const preservedAllTasks = searchParams.get(ALL_TASKS_PANEL_QUERY_KEY);
 
   return (
     <nav aria-label="Phases" className="flex min-h-0 flex-1 flex-col overflow-hidden px-2 py-3">
-      <p className="shrink-0 px-1 pb-3 text-[10px] font-medium uppercase tracking-wide text-neutral-500">
+      <p className="shrink-0 px-1 pb-2 text-[10px] font-medium uppercase tracking-wide text-neutral-500">
         Phases
       </p>
-      <div className="scrollbar-workspace-subtle min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-1.5 pr-0.5">
-          <PhaseChatRow
-            href={`/app/projects/${projectSlug}`}
-            isActive={activePhaseId === null}
-            label="Main"
-            onOpenTasks={() => openTasksForPhase(null)}
-            taskCount={taskCounts.main}
-            tasksAriaLabel={`Tasks for Main, ${taskCounts.main} tasks`}
-            tasksTitle="Open task list for Main"
-          />
-          {phases.map((p) => (
-            <PhaseChatRow
-              href={`/app/projects/${projectSlug}?phase=${p.id}`}
-              isActive={activePhaseId === p.id}
-              key={p.id}
-              label={p.label}
-              onOpenTasks={() => openTasksForPhase(p.id)}
-              taskCount={taskCounts.byPhaseId[p.id] ?? 0}
-              tasksAriaLabel={`Tasks for ${p.label}, ${taskCounts.byPhaseId[p.id] ?? 0} tasks`}
-              tasksTitle={`Open task list for ${p.label}`}
-            />
-          ))}
-        </div>
-      </div>
-      <div className="shrink-0 border-t border-workspace-hairline pt-3">
+      <div className="shrink-0 border-b border-workspace-hairline px-1 pb-3">
         <button
           aria-expanded={addOpen}
           className="flex w-full items-center gap-2 rounded-xl border border-transparent px-2 py-2.5 text-left text-sm font-medium text-neutral-500 transition hover:bg-white/[0.04] hover:text-neutral-300"
@@ -141,6 +120,31 @@ export function PhaseSidebarNav({
             />
           </div>
         ) : null}
+      </div>
+      <div className="scrollbar-workspace-subtle min-h-0 flex-1 overflow-y-auto pt-2">
+        <div className="flex flex-col gap-1.5 pr-0.5">
+          <PhaseChatRow
+            href={buildProjectPageHref(projectSlug, { allTasks: preservedAllTasks })}
+            isActive={activePhaseId === null}
+            label="Main"
+            onOpenTasks={() => openTasksForPhase(null)}
+            taskCount={taskCounts.main}
+            tasksAriaLabel={`Tasks for Main, ${taskCounts.main} tasks`}
+            tasksTitle="Open task list for Main"
+          />
+          {phases.map((p) => (
+            <PhaseChatRow
+              href={buildProjectPageHref(projectSlug, { phaseId: p.id, allTasks: preservedAllTasks })}
+              isActive={activePhaseId === p.id}
+              key={p.id}
+              label={p.label}
+              onOpenTasks={() => openTasksForPhase(p.id)}
+              taskCount={taskCounts.byPhaseId[p.id] ?? 0}
+              tasksAriaLabel={`Tasks for ${p.label}, ${taskCounts.byPhaseId[p.id] ?? 0} tasks`}
+              tasksTitle={`Open task list for ${p.label}`}
+            />
+          ))}
+        </div>
       </div>
     </nav>
   );

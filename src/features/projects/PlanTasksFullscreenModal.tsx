@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import type { PlanPayload } from '@/shared/domain/plan';
+import type { PlanPayload } from '@/shared/domain/plan-defaults';
 import {
   buildFlatPlanTasks,
   filterFlatPlanTasks,
@@ -44,6 +44,7 @@ export function PlanTasksFullscreenModal({
   onBeginEdit,
   onCancelEdit,
   onSaveEdit,
+  onDeleteEdit,
   onToggleSync,
   savePending,
   planLoading = false,
@@ -69,6 +70,7 @@ export function PlanTasksFullscreenModal({
   onBeginEdit: (row: FlatPlanTaskRow) => void;
   onCancelEdit: () => void;
   onSaveEdit: () => void;
+  onDeleteEdit: () => void;
   onToggleSync: (row: FlatPlanTaskRow) => void;
   /** True while task edit save is in flight (does not block Select/Deselect). */
   savePending: boolean;
@@ -223,6 +225,7 @@ export function PlanTasksFullscreenModal({
                       key={`${row.epicIndex}-${row.taskIndex}`}
                       onBeginEdit={() => onBeginEdit(row)}
                       onCancelEdit={onCancelEdit}
+                      onDeleteEdit={onDeleteEdit}
                       onDraftDescriptionChange={onDraftDescriptionChange}
                       onDraftTitleChange={onDraftTitleChange}
                       onSaveEdit={onSaveEdit}
