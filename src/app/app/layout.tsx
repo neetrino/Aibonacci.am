@@ -11,20 +11,17 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   }
   return (
     <AiShell contentClassName="flex h-dvh min-h-0 flex-col overflow-hidden">
-      <header className="shrink-0 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
+      <header className="shrink-0 border-b border-workspace-hairline bg-workspace-rail">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-8">
-            <Link className="font-semibold text-slate-100" href="/app">
-              PlanRelay
+            <Link className="font-semibold text-neutral-100" href="/app">
+              Aibonacci
             </Link>
-            <Link
-              className="text-sm text-violet-200/80 transition hover:text-white"
-              href="/"
-            >
+            <Link className="text-sm text-neutral-400 transition hover:text-neutral-200" href="/">
               Home
             </Link>
             <Link
-              className="text-sm text-violet-200/80 transition hover:text-white"
+              className="text-sm text-neutral-400 transition hover:text-neutral-200"
               href="/app/account"
             >
               My account
@@ -32,9 +29,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <div className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col overflow-y-auto px-6 py-8">
-        {children}
-      </div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">{children}</div>
     </AiShell>
   );
 }

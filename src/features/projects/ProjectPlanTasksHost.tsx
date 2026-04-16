@@ -11,6 +11,10 @@ import {
   type FlatPlanTaskRow,
 } from '@/features/projects/plan-tasks-iterate';
 import { PlanTasksFullscreenModal } from '@/features/projects/PlanTasksFullscreenModal';
+import {
+  ALL_TASKS_PANEL_DOM_ID,
+  TASK_LIST_TOGGLE_SELECTOR,
+} from '@/features/projects/plan-tasks-layout';
 import { ProjectPlanTasksProvider } from '@/features/projects/project-plan-tasks-context';
 import { logger } from '@/shared/lib/logger';
 import { toast } from 'sonner';
@@ -95,8 +99,22 @@ export function ProjectPlanTasksHost({
     [effectivePhaseId, phaseCacheKey],
   );
 
+  const closeModal = useCallback(() => {
+    setModalOpen(false);
+    setModalPlan(null);
+    setModalPhaseId(null);
+    setFetchError(null);
+    setSearch('');
+    setEditing(null);
+  }, []);
+
   const openTasksForPhase = useCallback(
     async (targetPhaseId: string | null) => {
+      if (modalOpen && phasesMatch(modalPhaseId, targetPhaseId)) {
+        closeModal();
+        return;
+      }
+
       setFetchError(null);
       setSearch('');
       setEditing(null);
@@ -140,17 +158,22 @@ export function ProjectPlanTasksHost({
         setPlanLoading(false);
       }
     },
-    [activePhaseId, phaseCacheKey, projectSlug],
+    [activePhaseId, closeModal, modalOpen, modalPhaseId, phaseCacheKey, projectSlug],
   );
 
-  const closeModal = useCallback(() => {
-    setModalOpen(false);
-    setModalPlan(null);
-    setModalPhaseId(null);
-    setFetchError(null);
-    setSearch('');
-    setEditing(null);
-  }, []);
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onPointerDownCapture = (e: PointerEvent) => {
+      const target = e.target;
+      if (!(target instanceof Node)) return;
+      const panel = document.getElementById(ALL_TASKS_PANEL_DOM_ID);
+      if (panel?.contains(target)) return;
+      if (target instanceof Element && target.closest(TASK_LIST_TOGGLE_SELECTOR)) return;
+      closeModal();
+    };
+    document.addEventListener('pointerdown', onPointerDownCapture, true);
+    return () => document.removeEventListener('pointerdown', onPointerDownCapture, true);
+  }, [modalOpen, closeModal]);
 
   const beginEdit = useCallback((row: FlatPlanTaskRow) => {
     setEditing({ epicIndex: row.epicIndex, taskIndex: row.taskIndex });

@@ -9,6 +9,7 @@ import { listProjectsWithPhasesForAccount } from '@/features/projects/project-qu
 import { DEFAULT_PLAN, parsePlanFromJson, type PlanPayload } from '@/shared/domain/plan';
 import { prisma } from '@/shared/lib/prisma';
 import { requireActiveUserId } from '@/shared/lib/session';
+import { AppMainConstrained } from '@/shared/ui/AppMainConstrained';
 import {
   WORKSPACE_ACCENT_BTN_CLASS,
   WORKSPACE_BODY_CLASS,
@@ -42,27 +43,29 @@ export default async function AccountPage({
 
   if (projects.length === 0) {
     return (
-      <div className="mx-auto flex max-w-lg flex-col gap-8">
-        <header className="flex flex-col gap-2">
-          <Link className={WORKSPACE_LINK_CLASS} href="/app">
-            ← All projects
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">My account</h1>
-          <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-            Signed in as <span className="font-medium text-slate-200">{email}</span>
-          </p>
-          <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-            Create a project first — then you can set the AI model and edit plan JSON here.
-          </p>
-        </header>
-        <div className={`${WORKSPACE_PANEL_CLASS} flex flex-col gap-4 p-6`}>
-          <form action={signOutAction}>
-            <button className={WORKSPACE_ACCENT_BTN_CLASS} type="submit">
-              Sign out
-            </button>
-          </form>
+      <AppMainConstrained>
+        <div className="mx-auto flex max-w-lg flex-col gap-8">
+          <header className="flex flex-col gap-2">
+            <Link className={WORKSPACE_LINK_CLASS} href="/app">
+              ← All projects
+            </Link>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">My account</h1>
+            <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
+              Signed in as <span className="font-medium text-slate-200">{email}</span>
+            </p>
+            <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
+              Create a project first — then you can set the AI model and edit plan JSON here.
+            </p>
+          </header>
+          <div className={`${WORKSPACE_PANEL_CLASS} flex flex-col gap-4 p-6`}>
+            <form action={signOutAction}>
+              <button className={WORKSPACE_ACCENT_BTN_CLASS} type="submit">
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
+      </AppMainConstrained>
     );
   }
 
@@ -93,40 +96,42 @@ export default async function AccountPage({
   const plan = resolvePlanPayload(snapshot?.payload ?? null);
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <Link className={WORKSPACE_LINK_CLASS} href="/app">
-          ← All projects
-        </Link>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">My account</h1>
-        <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-          Signed in as <span className="font-medium text-slate-200">{email}</span>
-        </p>
-        <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-          AI model and plan JSON apply to the selected project and phase.
-        </p>
-      </header>
+    <AppMainConstrained>
+      <div className="mx-auto flex max-w-3xl flex-col gap-8">
+        <header className="flex flex-col gap-2">
+          <Link className={WORKSPACE_LINK_CLASS} href="/app">
+            ← All projects
+          </Link>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">My account</h1>
+          <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
+            Signed in as <span className="font-medium text-slate-200">{email}</span>
+          </p>
+          <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
+            AI model and plan JSON apply to the selected project and phase.
+          </p>
+        </header>
 
-      <div className={`${WORKSPACE_PANEL_CLASS} flex flex-col gap-6 p-6`}>
-        <AccountContextPicker
-          activePhaseId={activePhaseId}
-          activeProjectSlug={activeProject.slug}
-          projects={projects}
-        />
-        <AccountSettingsBlocks
-          activePhaseId={activePhaseId}
-          plan={plan}
-          project={{
-            id: activeProject.id,
-            openaiChatModel: activeProject.openaiChatModel,
-          }}
-        />
-        <form action={signOutAction}>
-          <button className={WORKSPACE_ACCENT_BTN_CLASS} type="submit">
-            Sign out
-          </button>
-        </form>
+        <div className={`${WORKSPACE_PANEL_CLASS} flex flex-col gap-6 p-6`}>
+          <AccountContextPicker
+            activePhaseId={activePhaseId}
+            activeProjectSlug={activeProject.slug}
+            projects={projects}
+          />
+          <AccountSettingsBlocks
+            activePhaseId={activePhaseId}
+            plan={plan}
+            project={{
+              id: activeProject.id,
+              openaiChatModel: activeProject.openaiChatModel,
+            }}
+          />
+          <form action={signOutAction}>
+            <button className={WORKSPACE_ACCENT_BTN_CLASS} type="submit">
+              Sign out
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </AppMainConstrained>
   );
 }

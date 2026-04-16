@@ -4,8 +4,9 @@ import { AppToaster } from '@/shared/ui/app-toaster';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'PlanRelay',
-  description: 'AI-assisted planning with Bitrix24 sync',
+  title: 'Aibonacci',
+  description:
+    'AI-assisted planning with Bitrix24 sync — each step builds on project history, like Fibonacci terms build on the previous ones.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -1,14 +1,16 @@
-# Product brief — PlanRelay
+# Product brief — Aibonacci
 
-**Product name (working).** PlanRelay  
-**Repository.** Bitrix24-Task (PlanRelay web app)  
-**Last updated.** 2026-04-14
+**Product name.** Aibonacci  
+**Repository.** Bitrix24-Task (Aibonacci web app; rename remote when ready)  
+**Last updated.** 2026-04-16
 
 ---
 
 ## Description
 
-PlanRelay is a team web application that combines **AI-assisted planning**, a structured **task list** compatible with existing Bitrix24 YAML sync, **per-project Bitrix settings**, **chat history**, **project phases** (e.g. “phase 2” continuation), **Markdown export** for developers, and **one-click (or server-triggered) sync** to Bitrix using a secured incoming webhook. It extends the current repo workflow (Markdown → YAML → Bitrix) with persistence, accounts, and a minimal modern UI on **Vercel**.
+Aibonacci is a team web application that combines **AI-assisted planning**, a structured **task list** with Bitrix24 sync, **per-project Bitrix settings**, **chat history**, **project phases** (e.g. “phase 2” continuation), **Markdown export** for developers, and **one-click sync** to Bitrix using a secured incoming webhook — with persistence, accounts, and a minimal modern UI on **Vercel**.
+
+**Naming:** like a Fibonacci sequence, the **next planning step is shaped by the full history of prior steps**—persistent context, not one-off chat.
 
 ---
 
@@ -38,7 +40,7 @@ PlanRelay is a team web application that combines **AI-assisted planning**, a st
 - **Database:** **Neon** (PostgreSQL) + **Prisma**  
 - **Auth:** **Auth.js**  
 - **AI:** OpenAI (server-side only)  
-- **Bitrix:** incoming webhook + shared plan contract (`plans/example.plan.yaml` / `src/shared/domain/plan.ts`)  
+- **Bitrix:** incoming webhook + plan schema (`src/shared/domain/plan.ts`)  
 
 ---
 
@@ -76,4 +78,4 @@ PlanRelay is a team web application that combines **AI-assisted planning**, a st
 
 ## Extra notes
 
-- Product codename **PlanRelay** — relay plans to Bitrix and to developer Markdown.
+- Product **Aibonacci** — plans compound from history (Fibonacci metaphor) and relay to Bitrix and developer Markdown.

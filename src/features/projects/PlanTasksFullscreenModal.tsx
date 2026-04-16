@@ -10,17 +10,24 @@ import {
 } from '@/features/projects/plan-tasks-iterate';
 import { SyncToolbar } from '@/features/bitrix-sync/SyncToolbar';
 import { PlanTaskRowCard } from '@/features/projects/PlanTaskRowCard';
-import { WORKSPACE_FIELD_CLASS, WORKSPACE_GHOST_BTN_CLASS } from '@/shared/ui/workspace-ui';
+import { ALL_TASKS_PANEL_DOM_ID, TASKS_PHASE_RAIL_WIDTH_CLASS } from '@/features/projects/plan-tasks-layout';
+import {
+  WORKSPACE_FIELD_CLASS,
+  WORKSPACE_GHOST_BTN_CLASS,
+  WORKSPACE_H2_CLASS,
+} from '@/shared/ui/workspace-ui';
 
 type EditingTarget = { epicIndex: number; taskIndex: number };
 
 type TasksViewMode = 'grid' | 'list';
 
-/** Left strip (~20% viewport): glass backdrop, click closes drawer. */
-const TASKS_DRAWER_BACKDROP_WIDTH_CLASS = 'w-1/5';
-/** Right panel (~80% viewport): task list; slide-in via `tasks-drawer-panel-enter` in globals.css. */
-const TASKS_DRAWER_PANEL_WIDTH_CLASS = 'w-4/5';
+/** Slide-in animation from the right; see `tasks-drawer-panel-enter` in globals.css. */
 const TASKS_DRAWER_PANEL_ENTER_CLASS = 'tasks-drawer-panel-enter';
+
+const VIEW_TOGGLE_SHELL_CLASS =
+  'flex shrink-0 rounded-lg border border-white/10 bg-neutral-900/60 p-0.5 sm:ml-auto';
+const VIEW_TOGGLE_ACTIVE_CLASS = 'bg-neutral-800 text-neutral-100 ring-1 ring-white/10';
+const VIEW_TOGGLE_IDLE_CLASS = 'text-neutral-500 hover:text-neutral-200';
 
 export function PlanTasksFullscreenModal({
   open,
@@ -105,28 +112,31 @@ export function PlanTasksFullscreenModal({
     <div
       aria-labelledby={titleId}
       aria-modal="true"
-      className="fixed inset-0 z-[100] flex flex-row"
+      className="fixed inset-0 z-[100] flex min-h-0 w-full flex-row pointer-events-none"
       role="dialog"
     >
-      <button
-        aria-label="Close dialog"
-        className={`${TASKS_DRAWER_BACKDROP_WIDTH_CLASS} h-dvh shrink-0 cursor-pointer border-0 bg-slate-950/35 p-0 backdrop-blur-xl backdrop-saturate-150 transition-colors hover:bg-slate-950/45`}
-        onClick={onClose}
-        type="button"
+      {/*
+        Reserve width on lg+ so the tasks panel aligns with the chat column; the shell has
+        pointer-events-none so clicks reach the phase rail. Only the panel re-enables hit targets.
+      */}
+      <div
+        aria-hidden
+        className={`pointer-events-none hidden shrink-0 lg:block ${TASKS_PHASE_RAIL_WIDTH_CLASS}`}
       />
       <div
-        className={`relative z-[101] flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden rounded-l-2xl border border-white/10 border-r-0 bg-slate-950/95 shadow-2xl shadow-black/60 ring-1 ring-white/5 backdrop-blur-xl ${TASKS_DRAWER_PANEL_WIDTH_CLASS} ${TASKS_DRAWER_PANEL_ENTER_CLASS}`}
+        className={`relative z-[101] flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden border border-white/[0.08] border-r-0 bg-workspace-elevated shadow-none lg:rounded-none pointer-events-auto ${TASKS_DRAWER_PANEL_ENTER_CLASS}`}
+        id={ALL_TASKS_PANEL_DOM_ID}
       >
-        <div className="flex shrink-0 flex-col gap-3 border-b border-white/10 px-4 py-3 sm:px-5">
+        <div className="flex shrink-0 flex-col gap-3 border-b border-white/[0.08] px-4 py-3 sm:px-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold tracking-tight text-white" id={titleId}>
+              <h2 className={WORKSPACE_H2_CLASS} id={titleId}>
                 {title}
               </h2>
-              <p className="mt-0.5 text-xs text-slate-500">{filtered.length} tasks</p>
+              <p className="mt-0.5 text-xs text-neutral-500">{filtered.length} tasks</p>
             </div>
             <button
-              className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+              className={`shrink-0 ${WORKSPACE_GHOST_BTN_CLASS} px-2.5 py-1.5 text-xs`}
               onClick={onClose}
               type="button"
             >
@@ -157,18 +167,12 @@ export function PlanTasksFullscreenModal({
                 Markdown
               </a>
             </div>
-            <div
-              className="flex shrink-0 rounded-lg border border-white/10 bg-slate-900/80 p-0.5 sm:ml-auto"
-              role="group"
-              aria-label="Task layout"
-            >
+            <div className={VIEW_TOGGLE_SHELL_CLASS} role="group" aria-label="Task layout">
               <button
                 aria-controls={tasksLayoutRegionId}
                 aria-pressed={viewMode === 'grid'}
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
-                  viewMode === 'grid'
-                    ? 'bg-white/10 text-white ring-1 ring-white/15'
-                    : 'text-slate-400 hover:text-slate-200'
+                  viewMode === 'grid' ? VIEW_TOGGLE_ACTIVE_CLASS : VIEW_TOGGLE_IDLE_CLASS
                 }`}
                 onClick={() => setViewMode('grid')}
                 type="button"
@@ -179,9 +183,7 @@ export function PlanTasksFullscreenModal({
                 aria-controls={tasksLayoutRegionId}
                 aria-pressed={viewMode === 'list'}
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
-                  viewMode === 'list'
-                    ? 'bg-white/10 text-white ring-1 ring-white/15'
-                    : 'text-slate-400 hover:text-slate-200'
+                  viewMode === 'list' ? VIEW_TOGGLE_ACTIVE_CLASS : VIEW_TOGGLE_IDLE_CLASS
                 }`}
                 onClick={() => setViewMode('list')}
                 type="button"
@@ -191,12 +193,14 @@ export function PlanTasksFullscreenModal({
             </div>
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
+        <div className="min-h-0 flex-1 overflow-y-auto bg-workspace-canvas px-4 py-4 scrollbar-workspace-subtle sm:px-5">
           {planLoading ? (
-            <p className="py-12 text-center text-sm text-slate-400">Loading plan…</p>
+            <p className="py-12 text-center text-sm text-neutral-400">Loading plan…</p>
           ) : null}
           {!planLoading && fetchError ? (
-            <p className="py-8 text-center text-sm text-slate-400">Could not load plan for this phase.</p>
+            <p className="py-8 text-center text-sm text-neutral-400">
+              Could not load plan for this phase.
+            </p>
           ) : null}
           {!planLoading && !fetchError ? (
             <>
@@ -231,7 +235,7 @@ export function PlanTasksFullscreenModal({
                 })}
               </div>
               {filtered.length === 0 ? (
-                <p className="py-8 text-center text-xs text-slate-500">No tasks match your search.</p>
+                <p className="py-8 text-center text-xs text-neutral-500">No tasks match your search.</p>
               ) : null}
             </>
           ) : null}

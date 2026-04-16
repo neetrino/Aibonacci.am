@@ -11,4 +11,18 @@ export const TASKS_ASIDE_MAX_WIDTH_PX = 340;
  * lg:grid-cols-[minmax(260px,340px)_minmax(0,1fr)]
  */
 export const PROJECT_TASKS_CHAT_GRID_CLASS =
-  'grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden lg:grid-cols-[minmax(260px,340px)_minmax(0,1fr)] lg:gap-4 lg:-mx-6';
+  'grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden lg:grid-cols-[minmax(260px,340px)_minmax(0,1fr)] lg:gap-4';
+
+/**
+ * Width of the first grid column on `lg+` — keep in sync with
+ * `lg:grid-cols-[minmax(260px,340px)_…]`. Used by the tasks drawer so the overlay
+ * does not cover the phase rail.
+ */
+export const TASKS_PHASE_RAIL_WIDTH_CLASS = 'lg:w-[clamp(260px,26vw,340px)]';
+
+/** `id` on the All tasks panel — used for outside-close hit testing. */
+export const ALL_TASKS_PANEL_DOM_ID = 'all-tasks-panel';
+
+/** Sidebar Tasks buttons — excluded from All tasks outside-close; same-phase click toggles closed. */
+export const TASK_LIST_TOGGLE_DATA_KEY = 'data-task-list-toggle';
+export const TASK_LIST_TOGGLE_SELECTOR = `[${TASK_LIST_TOGGLE_DATA_KEY}]`;

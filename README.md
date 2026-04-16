@@ -1,6 +1,6 @@
 # Bitrix24: план → задачи в проекте
 
-## Веб-платформа PlanRelay
+## Веб-платформа Aibonacci
 
 Документация по полнофункциональной версии (Neon, Auth.js, Next.js, Vercel):
 
@@ -40,10 +40,6 @@ pnpm dev
 | `pnpm e2e` | Playwright (нужен dev-сервер или `PLAYWRIGHT_BASE_URL`) |
 
 ---
-
-## Черновики планов в `plans/`
-
-**Черновик** удобно вести в **`plans/*.md`** — шаблон `plans/example-plan.md` (заголовки `##` = эпики, списки = задачи). Файлы вида `*.plan.md` открываются как Markdown — см. `.vscode/settings.json`. **YAML** (`plans/example.plan.yaml`) — контракт для парсера и синка в приложении. Подробнее — `.cursor/rules/bitrix24-workflow.mdc`.
 
 ## `.env`
 

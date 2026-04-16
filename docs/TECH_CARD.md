@@ -1,6 +1,6 @@
-# Technology card — PlanRelay (Bitrix24 planning web)
+# Technology card — Aibonacci (Bitrix24 planning web)
 
-**Project.** PlanRelay — AI-assisted planning, YAML/Markdown export, Bitrix24 sync  
+**Project.** Aibonacci — AI-assisted planning, YAML/Markdown export, Bitrix24 sync  
 **Size.** B (medium)  
 **Date.** 2026-04-14  
 **Status.** draft — pending team confirmation on adaptive DB limits (pool, timeouts)
@@ -109,7 +109,7 @@
 | 7.7 | SMS | None | ✅ | |
 | 7.8 | AI | OpenAI API (server-only); optional Vercel AI SDK | ✅ | Key in env |
 | 7.9 | CMS | None | ✅ | |
-| 7.10 | Bitrix24 | Incoming webhook REST (`Webhook_URL`); plan contract `plans/example.plan.yaml` / `src/shared/domain/plan.ts` | ✅ | |
+| 7.10 | Bitrix24 | Incoming webhook REST (`Webhook_URL`); plan schema `src/shared/domain/plan.ts` | ✅ | |
 
 ---
 
@@ -164,7 +164,7 @@
 | 11.3 | `docs/01-ARCHITECTURE.md` | ✅ | |
 | 11.4 | `docs/02-TECH_SPEC.md` | ✅ | Functional + technical spec |
 | 11.5 | `docs/PROGRESS.md` | ✅ | |
-| 11.6 | `README.md` | ✅ | Root readme + sync CLI + PlanRelay links |
+| 11.6 | `README.md` | ✅ | Root readme + Aibonacci links |
 | 11.7 | `.env.example` | ✅ | Neon, Auth.js, Bitrix, OpenAI |
 | 11.8 | `docs/DECISIONS.md` | ✅ | ADR-001…003 |
 
@@ -178,6 +178,6 @@ Not filled until release — see template `docs/reference/templates/TECH_CARD_TE
 
 ## Summary
 
-**Confirmed stack:** Neon (PostgreSQL) + Prisma + Auth.js + Next.js on Vercel + OpenAI (server) + existing Bitrix YAML sync script.
+**Confirmed stack:** Neon (PostgreSQL) + Prisma + Auth.js + Next.js on Vercel + OpenAI (server) + Bitrix sync (web app).
 
 **Discuss with team:** OAuth providers, rate limits, DB timeouts, pnpm migration timing, email provider for magic link.
