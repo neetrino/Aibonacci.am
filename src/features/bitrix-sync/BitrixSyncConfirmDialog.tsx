@@ -7,6 +7,12 @@ import { WORKSPACE_GHOST_BTN_CLASS } from '@/shared/ui/workspace-ui';
 const OVERLAY_Z = 'z-[120]';
 const PANEL_Z = 'z-[121]';
 
+/**
+ * Portal is under `document.body`, not inside the All tasks panel. `ProjectPlanTasksHost` outside-close
+ * must treat clicks here as inside-app UI, not as “click outside” the tasks drawer.
+ */
+export const BITRIX_SYNC_CONFIRM_PORTAL_SELECTOR = '[data-bitrix-sync-confirm]';
+
 export function BitrixSyncConfirmDialog({
   open,
   onCancel,
@@ -44,6 +50,7 @@ export function BitrixSyncConfirmDialog({
       aria-labelledby={titleId}
       aria-modal="true"
       className={`fixed inset-0 ${OVERLAY_Z} flex items-center justify-center p-4`}
+      data-bitrix-sync-confirm=""
       role="dialog"
     >
       <button
