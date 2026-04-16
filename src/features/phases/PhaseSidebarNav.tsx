@@ -19,9 +19,12 @@ const PHASE_ROW_WRAP_IDLE =
 const LINK_ACTIVE = 'font-medium text-neutral-100';
 const LINK_IDLE = 'font-medium text-neutral-400 hover:text-neutral-200';
 
-function tasksButtonClass(isRowActive: boolean): string {
+function tasksButtonClass(isRowActive: boolean, isTasksPanelOpen: boolean): string {
   const base =
     'flex shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20';
+  if (isTasksPanelOpen) {
+    return `${base} border-violet-500/40 bg-violet-600 text-white shadow-sm hover:bg-violet-500`;
+  }
   if (isRowActive) {
     return `${base} border-white/10 bg-neutral-900 text-neutral-100 hover:bg-neutral-950`;
   }
@@ -30,6 +33,7 @@ function tasksButtonClass(isRowActive: boolean): string {
 
 function PhaseChatRow({
   isActive,
+  isTasksPanelOpen,
   href,
   label,
   taskCount,
@@ -38,6 +42,7 @@ function PhaseChatRow({
   tasksTitle,
 }: {
   isActive: boolean;
+  isTasksPanelOpen: boolean;
   href: string;
   label: string;
   taskCount: number;
@@ -56,7 +61,8 @@ function PhaseChatRow({
         </Link>
         <button
           aria-label={tasksAriaLabel}
-          className={tasksButtonClass(isActive)}
+          aria-pressed={isTasksPanelOpen}
+          className={tasksButtonClass(isActive, isTasksPanelOpen)}
           onClick={() => onOpenTasks()}
           title={tasksTitle}
           type="button"
@@ -90,9 +96,10 @@ export function PhaseSidebarNav({
   taskCounts: { main: number; byPhaseId: Record<string, number> };
 }) {
   const [addOpen, setAddOpen] = useState(false);
-  const { openTasksForPhase } = useProjectPlanTasks();
+  const { openTasksForPhase, openTasksPhaseId } = useProjectPlanTasks();
   const searchParams = useSearchParams();
   const preservedAllTasks = searchParams.get(ALL_TASKS_PANEL_QUERY_KEY);
+  const isTasksPanelOpenForMain = openTasksPhaseId === null;
 
   return (
     <nav aria-label="Phases" className="flex min-h-0 flex-1 flex-col overflow-hidden px-2 py-3">
@@ -126,6 +133,7 @@ export function PhaseSidebarNav({
           <PhaseChatRow
             href={buildProjectPageHref(projectSlug, { allTasks: preservedAllTasks })}
             isActive={activePhaseId === null}
+            isTasksPanelOpen={isTasksPanelOpenForMain}
             label="Main"
             onOpenTasks={() => openTasksForPhase(null)}
             taskCount={taskCounts.main}
@@ -136,6 +144,7 @@ export function PhaseSidebarNav({
             <PhaseChatRow
               href={buildProjectPageHref(projectSlug, { phaseId: p.id, allTasks: preservedAllTasks })}
               isActive={activePhaseId === p.id}
+              isTasksPanelOpen={openTasksPhaseId === p.id}
               key={p.id}
               label={p.label}
               onOpenTasks={() => openTasksForPhase(p.id)}
