@@ -6,7 +6,7 @@ export default function SignInPage() {
   return (
     <AiShell contentClassName="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-10 px-6 py-16 text-center">
       <div className="w-full max-w-md">
-        <p className="text-xs font-medium uppercase tracking-wider text-violet-300">PlanRelay</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-violet-300">Aibonacci</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
           Sign in to continue
         </h1>

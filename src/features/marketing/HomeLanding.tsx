@@ -68,7 +68,7 @@ export function HomeLanding({ variant }: HomeLandingProps) {
       <section className="flex flex-col items-center text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-workspace-elevated px-3 py-1 text-xs font-medium text-neutral-300">
           <SparklesGlyph className="h-3.5 w-3.5 text-neutral-400" />
-          PlanRelay · AI-assisted planning
+          Aibonacci · each step builds on the last
         </div>
         <h1 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-neutral-100 sm:text-5xl sm:leading-[1.1]">
           Ideas become <span className="text-neutral-400">actionable tasks</span>

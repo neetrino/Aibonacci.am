@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-8">
             <Link className="font-semibold text-neutral-100" href="/app">
-              PlanRelay
+              Aibonacci
             </Link>
             <Link className="text-sm text-neutral-400 transition hover:text-neutral-200" href="/">
               Home

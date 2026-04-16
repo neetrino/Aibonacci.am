@@ -1,4 +1,4 @@
-# Architecture decisions — PlanRelay
+# Architecture decisions — Aibonacci
 
 **Format.** Short ADR-style entries.  
 **Last updated.** 2026-04-14

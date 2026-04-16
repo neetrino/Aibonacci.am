@@ -1,6 +1,6 @@
-# Technology card — PlanRelay (Bitrix24 planning web)
+# Technology card — Aibonacci (Bitrix24 planning web)
 
-**Project.** PlanRelay — AI-assisted planning, YAML/Markdown export, Bitrix24 sync  
+**Project.** Aibonacci — AI-assisted planning, YAML/Markdown export, Bitrix24 sync  
 **Size.** B (medium)  
 **Date.** 2026-04-14  
 **Status.** draft — pending team confirmation on adaptive DB limits (pool, timeouts)
@@ -164,7 +164,7 @@
 | 11.3 | `docs/01-ARCHITECTURE.md` | ✅ | |
 | 11.4 | `docs/02-TECH_SPEC.md` | ✅ | Functional + technical spec |
 | 11.5 | `docs/PROGRESS.md` | ✅ | |
-| 11.6 | `README.md` | ✅ | Root readme + PlanRelay links |
+| 11.6 | `README.md` | ✅ | Root readme + Aibonacci links |
 | 11.7 | `.env.example` | ✅ | Neon, Auth.js, Bitrix, OpenAI |
 | 11.8 | `docs/DECISIONS.md` | ✅ | ADR-001…003 |
 

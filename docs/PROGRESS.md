@@ -1,6 +1,6 @@
-# Development progress — PlanRelay / Bitrix24-Task
+# Development progress — Aibonacci / Bitrix24-Task
 
-**Project.** PlanRelay (web)  
+**Project.** Aibonacci (web)  
 **Phase.** Core web app + integrations  
 **Overall progress.** ~65% (MVP scaffolded; production hardening ongoing)
 

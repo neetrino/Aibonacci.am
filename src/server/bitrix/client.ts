@@ -2,7 +2,7 @@ import type { EpicAddResult, TaskAddResult } from '@/server/bitrix/types';
 
 /** Bitrix REST: user or task state blocks modify (closed task, wrong rights, stale id). */
 const TASK_ACTION_DENIED_HINT =
-  'Typical causes: the webhook user cannot edit this task, the task is completed/closed in Bitrix, the task was moved/deleted, or the stored Bitrix task id is outdated. In Bitrix: check rights for the incoming webhook user, reopen the task if needed, or in PlanRelay clear the Bitrix link for that row and sync again to create a new task.';
+  'Typical causes: the webhook user cannot edit this task, the task is completed/closed in Bitrix, the task was moved/deleted, or the stored Bitrix task id is outdated. In Bitrix: check rights for the incoming webhook user, reopen the task if needed, or in Aibonacci clear the Bitrix link for that row and sync again to create a new task.';
 
 function appendBitrixDeniedHint(message: string, description: string | undefined): string {
   const d = description ?? '';

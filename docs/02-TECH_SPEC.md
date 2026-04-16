@@ -1,4 +1,4 @@
-# Technical specification — PlanRelay web platform
+# Technical specification — Aibonacci web platform
 
 **Version.** 1.0  
 **Date.** 2026-04-14  

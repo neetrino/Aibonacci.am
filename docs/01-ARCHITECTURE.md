@@ -1,6 +1,6 @@
-# Architecture — PlanRelay
+# Architecture — Aibonacci
 
-**Product.** PlanRelay — collaborative AI-assisted planning with Bitrix24 sync and developer-friendly Markdown export.  
+**Product.** Aibonacci — collaborative AI-assisted planning with Bitrix24 sync and developer-friendly Markdown export.  
 **Project size.** B (medium), feature-based layout.  
 **Last updated.** 2026-04-14
 

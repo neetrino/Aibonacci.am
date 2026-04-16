@@ -6,7 +6,7 @@ import { Resend } from 'resend';
 import { prisma } from '@/shared/lib/prisma';
 import { logger } from '@/shared/lib/logger';
 
-const fromFallback = 'PlanRelay <onboarding@resend.dev>';
+const fromFallback = 'Aibonacci <onboarding@resend.dev>';
 
 const SECONDS_PER_DAY = 86_400;
 const SESSION_MAX_AGE_SECONDS = 30 * SECONDS_PER_DAY;
@@ -71,8 +71,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const { error } = await resend.emails.send({
           from,
           to: identifier,
-          subject: 'Sign in to PlanRelay',
-          html: `<p><a href="${url}">Sign in to PlanRelay</a></p>`,
+          subject: 'Sign in to Aibonacci',
+          html: `<p><a href="${url}">Sign in to Aibonacci</a></p>`,
         });
         if (error) {
           logger.error({ err: error, email: identifier }, 'Resend send failed');
