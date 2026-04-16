@@ -33,7 +33,7 @@ function isCancellationError(err: unknown): boolean {
 
 function buildAssistantTextFromJsonBody(body: Record<string, unknown>): string {
   const rawAssistant = body.assistant_message;
-  let text =
+  const text =
     typeof rawAssistant === 'string' && rawAssistant.trim()
       ? rawAssistant.trim()
       : 'Describe your goal when you are ready — I will turn it into epics and tasks.';
