@@ -38,3 +38,18 @@ export const WORKSPACE_INNER_SCROLL_CLASS =
 
 export const WORKSPACE_CODE_CLASS =
   'rounded-md bg-neutral-800 px-1.5 py-0.5 font-mono text-xs text-neutral-300';
+
+/** Stacked outer + top specular — shared by toolbar “islands” and project row hover. */
+export const WORKSPACE_FLOAT_3D_SHADOW_CLASS =
+  'shadow-[0_14px_44px_-18px_rgba(0,0,0,0.72),0_6px_20px_-12px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.09)]';
+
+/** Toolbar search/create chips on /app. */
+export const WORKSPACE_FLOAT_3D_ISLAND_CLASS =
+  `rounded-2xl border-0 bg-neutral-800/55 p-2.5 ${WORKSPACE_FLOAT_3D_SHADOW_CLASS} backdrop-blur-md sm:p-3`;
+
+/**
+ * Project list row (default): flat in the list; hover uses the same 3D shadow as toolbar (no translate —
+ * lifting caused gaps between rows and cursor flicker when moving to the next item).
+ */
+export const WORKSPACE_PROJECT_LIST_ROW_HOVER_3D_CLASS =
+  'group relative z-0 mx-1 rounded-2xl border-0 px-4 py-3 transition duration-200 ease-out hover:z-[1] hover:bg-neutral-800/55 hover:shadow-[0_14px_44px_-18px_rgba(0,0,0,0.72),0_6px_20px_-12px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.09)] hover:backdrop-blur-sm';

@@ -10,10 +10,11 @@ import {
   WORKSPACE_ACCENT_BTN_CLASS,
   WORKSPACE_FIELD_CLASS,
   WORKSPACE_GHOST_BTN_CLASS,
+  WORKSPACE_PROJECT_LIST_ROW_HOVER_3D_CLASS,
 } from '@/shared/ui/workspace-ui';
 
 const RENAME_ICON_BTN_CLASS =
-  'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-400 transition hover:border-white/15 hover:bg-white/[0.06] hover:text-neutral-200 disabled:pointer-events-none disabled:opacity-60';
+  'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-400 transition group-hover:border-white/20 group-hover:bg-white/[0.07] group-hover:text-neutral-200 hover:border-white/15 hover:bg-white/[0.06] hover:text-neutral-200 disabled:pointer-events-none disabled:opacity-60';
 
 export type ProjectListRow = {
   id: string;
@@ -115,19 +116,24 @@ export function WorkspaceProjectListRow({ project }: WorkspaceProjectListRowProp
 
   return (
     <>
-      <div className="flex flex-col gap-3 px-5 py-4 transition hover:bg-white/[0.04] sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <Link
-          className="flex min-w-0 flex-1 items-center justify-between gap-4 sm:min-h-[2.25rem] sm:px-0 sm:py-0"
-          href={`/app/projects/${project.slug}`}
+      <div
+        className={`${WORKSPACE_PROJECT_LIST_ROW_HOVER_3D_CLASS} relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4`}
+      >
+        <Link className="absolute inset-0 z-0 rounded-2xl" href={`/app/projects/${project.slug}`}>
+          <span className="sr-only">Open project {project.name}</span>
+        </Link>
+        <div
+          aria-hidden
+          className="relative z-[1] flex min-w-0 flex-1 items-center justify-between gap-4 pointer-events-none sm:min-h-[2.25rem]"
         >
           <span className="font-medium text-neutral-100">{project.name}</span>
           <span className="shrink-0 text-xs tabular-nums text-neutral-500">
             {project.updatedAt.slice(0, 10)}
           </span>
-        </Link>
+        </div>
         <button
           aria-label={`Rename project ${project.name}`}
-          className={`self-start sm:self-center ${RENAME_ICON_BTN_CLASS}`}
+          className={`relative z-[2] self-start sm:self-center ${RENAME_ICON_BTN_CLASS}`}
           disabled={isPending}
           onClick={(e) => {
             e.preventDefault();

@@ -9,7 +9,7 @@ import {
   type ProjectListRow,
 } from '@/features/projects/WorkspaceProjectListRow';
 import { MagnifyingGlassGlyph } from '@/shared/ui/brand-icons';
-import { WORKSPACE_PANEL_CLASS } from '@/shared/ui/workspace-ui';
+import { WORKSPACE_FLOAT_3D_ISLAND_CLASS, WORKSPACE_PANEL_CLASS } from '@/shared/ui/workspace-ui';
 
 export type { ProjectListRow };
 
@@ -26,13 +26,6 @@ const PROJECTS_SEARCH_FIELD_WRAP_CLASS = 'relative min-w-0';
  */
 const PROJECTS_TOOLBAR_CLASS =
   'grid w-full grid-cols-1 gap-3 sm:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] sm:items-center sm:gap-4';
-
-/**
- * Soft “floating” island — reused twice (search / create) so they read as two separate 3D chips,
- * same depth treatment as the previous single bar.
- */
-const PROJECTS_FLOAT_3D_ISLAND_CLASS =
-  'rounded-2xl border-0 bg-neutral-800/55 p-2.5 shadow-[0_14px_44px_-18px_rgba(0,0,0,0.72),0_6px_20px_-12px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.09)] backdrop-blur-md sm:p-3';
 
 /** Inputs inside the shell: no box border — they sit on the shared lift. */
 const PROJECTS_TOOLBAR_INPUT_INNER_CLASS =
@@ -134,7 +127,7 @@ export function WorkspaceProjectsSection({ initialProjects }: { initialProjects:
       <div className={`overflow-hidden ${WORKSPACE_PANEL_CLASS}`}>
         <div className="border-b border-workspace-hairline bg-workspace-canvas px-5 py-4">
           <div className={PROJECTS_TOOLBAR_CLASS}>
-            <div className={`${PROJECTS_FLOAT_3D_ISLAND_CLASS} min-w-0`}>
+            <div className={`${WORKSPACE_FLOAT_3D_ISLAND_CLASS} min-w-0`}>
               <div className={PROJECTS_SEARCH_FIELD_WRAP_CLASS}>
                 <MagnifyingGlassGlyph className="pointer-events-none absolute left-3 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 text-neutral-400" />
                 <label className="sr-only" htmlFor="workspace-project-search">
@@ -154,7 +147,7 @@ export function WorkspaceProjectsSection({ initialProjects }: { initialProjects:
 
             <form
               ref={formRef}
-              className={`${PROJECTS_FLOAT_3D_ISLAND_CLASS} ${PROJECTS_CREATE_FORM_CLASS} min-w-0`}
+              className={`${WORKSPACE_FLOAT_3D_ISLAND_CLASS} ${PROJECTS_CREATE_FORM_CLASS} min-w-0`}
               onSubmit={handleSubmit}
             >
               <label className="sr-only" htmlFor="name">
@@ -180,7 +173,7 @@ export function WorkspaceProjectsSection({ initialProjects }: { initialProjects:
             </form>
           </div>
         </div>
-        <ul className="divide-y divide-white/[0.06]">
+        <ul className="flex flex-col">
           {!hasAnyProjects ? (
             <li className="px-5 py-8 text-sm text-neutral-500">No projects yet — add one above.</li>
           ) : filteredRows.length === 0 ? (
