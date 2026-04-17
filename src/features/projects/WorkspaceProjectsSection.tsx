@@ -9,7 +9,7 @@ import {
   type ProjectListRow,
 } from '@/features/projects/WorkspaceProjectListRow';
 import { MagnifyingGlassGlyph } from '@/shared/ui/brand-icons';
-import { WORKSPACE_FLOAT_3D_ISLAND_CLASS, WORKSPACE_PANEL_CLASS } from '@/shared/ui/workspace-ui';
+import { WORKSPACE_PANEL_CLASS, WORKSPACE_TOOLBAR_3D_ISLAND_CLASS } from '@/shared/ui/workspace-ui';
 
 export type { ProjectListRow };
 
@@ -37,9 +37,9 @@ const PROJECTS_TOOLBAR_NAME_INNER_CLASS =
 /** Tighter create row: slightly smaller gaps and button padding. */
 const PROJECTS_CREATE_FORM_CLASS = 'flex min-w-0 flex-row items-center gap-2';
 
-/** Primary action: same “lift” family, violet volume + soft specular inset. */
+/** Primary Create — solid violet, 3D shadow + top specular (no gradient). */
 const PROJECTS_CREATE_BTN_CLASS =
-  'shrink-0 rounded-xl border-0 bg-gradient-to-b from-violet-500 to-violet-700 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_24px_-10px_rgba(91,33,182,0.55),0_4px_12px_-6px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] outline-none transition hover:from-violet-400 hover:to-violet-600 hover:shadow-[0_10px_28px_-10px_rgba(91,33,182,0.5),inset_0_1px_0_0_rgba(255,255,255,0.22)] focus-visible:ring-2 focus-visible:ring-violet-400/50 disabled:pointer-events-none disabled:opacity-60 sm:px-4';
+  'shrink-0 rounded-xl border-0 bg-violet-600 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_24px_-10px_rgba(91,33,182,0.55),0_4px_12px_-6px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.2)] outline-none transition hover:bg-violet-500 hover:shadow-[0_10px_28px_-10px_rgba(91,33,182,0.5),inset_0_1px_0_0_rgba(255,255,255,0.22)] focus-visible:ring-2 focus-visible:ring-violet-400/50 disabled:pointer-events-none disabled:opacity-60 sm:px-4';
 
 function buildDisplayRows(
   serverProjects: ProjectListRow[],
@@ -127,7 +127,7 @@ export function WorkspaceProjectsSection({ initialProjects }: { initialProjects:
       <div className={`overflow-hidden ${WORKSPACE_PANEL_CLASS}`}>
         <div className="border-b border-workspace-hairline bg-workspace-canvas px-5 py-4">
           <div className={PROJECTS_TOOLBAR_CLASS}>
-            <div className={`${WORKSPACE_FLOAT_3D_ISLAND_CLASS} min-w-0`}>
+            <div className={`${WORKSPACE_TOOLBAR_3D_ISLAND_CLASS} min-w-0`}>
               <div className={PROJECTS_SEARCH_FIELD_WRAP_CLASS}>
                 <MagnifyingGlassGlyph className="pointer-events-none absolute left-3 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 text-neutral-400" />
                 <label className="sr-only" htmlFor="workspace-project-search">
@@ -147,7 +147,7 @@ export function WorkspaceProjectsSection({ initialProjects }: { initialProjects:
 
             <form
               ref={formRef}
-              className={`${WORKSPACE_FLOAT_3D_ISLAND_CLASS} ${PROJECTS_CREATE_FORM_CLASS} min-w-0`}
+              className={`${WORKSPACE_TOOLBAR_3D_ISLAND_CLASS} ${PROJECTS_CREATE_FORM_CLASS} min-w-0`}
               onSubmit={handleSubmit}
             >
               <label className="sr-only" htmlFor="name">
@@ -173,7 +173,7 @@ export function WorkspaceProjectsSection({ initialProjects }: { initialProjects:
             </form>
           </div>
         </div>
-        <ul className="flex flex-col">
+        <ul className="flex flex-col divide-y divide-white/[0.03] px-1 py-2">
           {!hasAnyProjects ? (
             <li className="px-5 py-8 text-sm text-neutral-500">No projects yet — add one above.</li>
           ) : filteredRows.length === 0 ? (

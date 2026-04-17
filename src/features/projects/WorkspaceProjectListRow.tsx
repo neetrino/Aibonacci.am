@@ -10,7 +10,7 @@ import {
   WORKSPACE_ACCENT_BTN_CLASS,
   WORKSPACE_FIELD_CLASS,
   WORKSPACE_GHOST_BTN_CLASS,
-  WORKSPACE_PROJECT_LIST_ROW_HOVER_3D_CLASS,
+  WORKSPACE_GLASS_ROW_HOVER_CLASS,
 } from '@/shared/ui/workspace-ui';
 
 const RENAME_ICON_BTN_CLASS =
@@ -117,7 +117,7 @@ export function WorkspaceProjectListRow({ project }: WorkspaceProjectListRowProp
   return (
     <>
       <div
-        className={`${WORKSPACE_PROJECT_LIST_ROW_HOVER_3D_CLASS} relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4`}
+        className={`${WORKSPACE_GLASS_ROW_HOVER_CLASS} relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4`}
       >
         <Link className="absolute inset-0 z-0 rounded-2xl" href={`/app/projects/${project.slug}`}>
           <span className="sr-only">Open project {project.name}</span>
