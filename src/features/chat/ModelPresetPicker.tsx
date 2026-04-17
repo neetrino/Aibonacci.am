@@ -83,8 +83,11 @@ function ModelSectionToggle({
     <button
       aria-controls={controlsId}
       aria-expanded={open}
+      aria-haspopup="menu"
       className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[13px] font-medium transition ${
-        active ? 'bg-white/[0.04] text-neutral-100' : 'text-neutral-200 hover:bg-white/[0.04]'
+        active || open
+          ? 'bg-white/[0.04] text-neutral-100'
+          : 'text-neutral-200 hover:bg-white/[0.04]'
       }`}
       onClick={onToggle}
       type="button"
@@ -95,7 +98,7 @@ function ModelSectionToggle({
       </span>
       <svg
         aria-hidden
-        className={`h-3.5 w-3.5 text-neutral-500 transition ${open ? 'rotate-90' : ''}`}
+        className="h-3.5 w-3.5 text-neutral-500"
         fill="none"
         viewBox="0 0 24 24"
       >
@@ -111,6 +114,38 @@ function ModelSectionToggle({
   );
 }
 
+function ModelSideFlyout({
+  controlsId,
+  effective,
+  onSelectPinnedModel,
+}: {
+  controlsId: string;
+  effective: ModelOverride;
+  onSelectPinnedModel: (modelId: string) => void;
+}) {
+  const pinnedActive = effective.preset === 'PINNED';
+  return (
+    <div
+      className="absolute bottom-0 left-full z-50 pl-2"
+      id={controlsId}
+      role="menu"
+    >
+      <div className="w-64 rounded-2xl border border-white/[0.06] bg-neutral-900/95 p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.7)] backdrop-blur">
+        <div className="flex flex-col gap-1">
+          {CHAT_MODELS.map((m) => (
+            <ModelRow
+              active={pinnedActive && effective.pinnedModelId === m.id}
+              key={m.id}
+              modelId={m.id}
+              onSelect={() => onSelectPinnedModel(m.id)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PopoverBody({
   popoverRef,
   controlsId,
@@ -120,6 +155,8 @@ function PopoverBody({
   onSelectPreset,
   onSelectPinnedModel,
   onToggleModelSection,
+  onOpenModelSection,
+  onCloseModelSection,
   onReset,
 }: {
   popoverRef: React.RefObject<HTMLDivElement | null>;
@@ -130,6 +167,8 @@ function PopoverBody({
   onSelectPreset: (preset: ModelPreset) => void;
   onSelectPinnedModel: (modelId: string) => void;
   onToggleModelSection: () => void;
+  onOpenModelSection: () => void;
+  onCloseModelSection: () => void;
   onReset: () => void;
 }) {
   const pinnedActive = effective.preset === 'PINNED';
@@ -151,7 +190,11 @@ function PopoverBody({
         ))}
       </div>
 
-      <div className="mt-1 border-t border-white/[0.05] pt-1">
+      <div
+        className="relative mt-1 border-t border-white/[0.05] pt-1"
+        onMouseEnter={onOpenModelSection}
+        onMouseLeave={onCloseModelSection}
+      >
         <ModelSectionToggle
           active={pinnedActive}
           controlsId={`${controlsId}-models`}
@@ -159,16 +202,11 @@ function PopoverBody({
           open={modelSectionOpen}
         />
         {modelSectionOpen ? (
-          <div className="mt-1 flex flex-col gap-1" id={`${controlsId}-models`}>
-            {CHAT_MODELS.map((m) => (
-              <ModelRow
-                active={pinnedActive && effective.pinnedModelId === m.id}
-                key={m.id}
-                modelId={m.id}
-                onSelect={() => onSelectPinnedModel(m.id)}
-              />
-            ))}
-          </div>
+          <ModelSideFlyout
+            controlsId={`${controlsId}-models`}
+            effective={effective}
+            onSelectPinnedModel={onSelectPinnedModel}
+          />
         ) : null}
       </div>
 
@@ -231,6 +269,8 @@ export function ModelPresetPicker({
           effective={effective}
           hasOverride={hasOverride}
           modelSectionOpen={modelSectionOpen}
+          onCloseModelSection={() => setModelSectionOpen(false)}
+          onOpenModelSection={() => setModelSectionOpen(true)}
           onReset={onReset}
           onSelectPinnedModel={selectPinnedModel}
           onSelectPreset={selectPreset}
