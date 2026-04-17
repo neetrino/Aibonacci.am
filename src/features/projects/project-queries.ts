@@ -14,7 +14,7 @@ export async function getProjectForUser(slug: string, userId: string) {
   });
 }
 
-/** Projects with phases for /app/account (AI model + plan JSON are scoped per project/phase). */
+/** Projects with phases; account page uses the first row (latest by `updatedAt`) for defaults. */
 export async function listProjectsWithPhasesForAccount(userId: string) {
   return prisma.project.findMany({
     where: { ownerId: userId },

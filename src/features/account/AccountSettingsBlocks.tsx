@@ -1,6 +1,10 @@
+import { AccountPlanEditorSection } from '@/features/account/AccountPlanEditorSection';
+import {
+  ACCOUNT_DETAILS_CLASS,
+  ACCOUNT_SUMMARY_CHEVRON_CLASS,
+  ACCOUNT_SUMMARY_ROW_CLASS,
+} from '@/features/account/account-settings-classes';
 import { ChatModelForm } from '@/features/projects/ChatModelForm';
-import { SETUP_DETAILS_CLASS, SETUP_SUMMARY_CLASS } from '@/features/projects/setup-panel-classes';
-import { PlanEditor } from '@/features/plan-editor/PlanEditor';
 import type { PlanPayload } from '@/shared/domain/plan-defaults';
 import { WORKSPACE_BODY_CLASS } from '@/shared/ui/workspace-ui';
 
@@ -19,22 +23,27 @@ export function AccountSettingsBlocks({
   plan: PlanPayload;
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <details className={SETUP_DETAILS_CLASS} open>
-        <summary className={SETUP_SUMMARY_CLASS}>AI model</summary>
-        <div className="mt-3">
-          <ChatModelForm project={project} />
-        </div>
-      </details>
-      <details className={SETUP_DETAILS_CLASS} open>
-        <summary className={SETUP_SUMMARY_CLASS}>Advanced · plan JSON</summary>
+    <div className="flex flex-col gap-3">
+      <details className={ACCOUNT_DETAILS_CLASS} open>
+        <summary className={ACCOUNT_SUMMARY_ROW_CLASS}>
+          <span>AI model</span>
+          <span aria-hidden className={ACCOUNT_SUMMARY_CHEVRON_CLASS}>
+            ▼
+          </span>
+        </summary>
         <p className={`mt-2 ${WORKSPACE_BODY_CLASS} text-xs`}>
-          Edit raw plan if needed; chat usually updates this automatically.
+          Model used for AI chat in this project. Saved per project, not per phase.
         </p>
         <div className="mt-3">
-          <PlanEditor embedded initialPlan={plan} phaseId={activePhaseId} projectId={project.id} />
+          <ChatModelForm key={project.id} project={project} />
         </div>
       </details>
+
+      <AccountPlanEditorSection
+        initialPlan={plan}
+        phaseId={activePhaseId}
+        projectId={project.id}
+      />
     </div>
   );
 }

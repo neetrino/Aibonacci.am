@@ -1,16 +1,15 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { AccountContextPicker } from '@/features/account/AccountContextPicker';
+import { parseAccountTab } from '@/features/account/account-tab';
+import { AccountProfilePanel } from '@/features/account/AccountProfilePanel';
 import { AccountSettingsBlocks } from '@/features/account/AccountSettingsBlocks';
-import { accountSettingsPath } from '@/features/account/account-settings-path';
-import { signOutAction } from '@/features/auth/auth-actions';
+import { AccountSidebar } from '@/features/account/AccountSidebar';
 import { listProjectsWithPhasesForAccount } from '@/features/projects/project-queries';
 import { DEFAULT_PLAN, parsePlanFromJson, type PlanPayload } from '@/shared/domain/plan';
 import { prisma } from '@/shared/lib/prisma';
 import { getSession, requireActiveUserId } from '@/shared/lib/session';
 import { AppMainConstrained } from '@/shared/ui/AppMainConstrained';
 import {
-  WORKSPACE_ACCENT_BTN_CLASS,
   WORKSPACE_BODY_CLASS,
   WORKSPACE_LINK_CLASS,
   WORKSPACE_PANEL_CLASS,
@@ -28,65 +27,69 @@ function resolvePlanPayload(snapshotPayload: unknown | null): PlanPayload {
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ project?: string; phase?: string }>;
+  searchParams: Promise<{ project?: string; phase?: string; tab?: string }>;
 }) {
+  const sp = await searchParams;
+  if (typeof sp.project === 'string' || typeof sp.phase === 'string') {
+    redirect('/app/account');
+  }
+
+  const activeTab = parseAccountTab(
+    typeof sp.tab === 'string' ? sp.tab : undefined,
+  );
+
   const userId = await requireActiveUserId();
   const session = await getSession();
-  const sp = await searchParams;
   const projects = await listProjectsWithPhasesForAccount(userId);
 
-  const projectParam = typeof sp.project === 'string' ? sp.project : undefined;
-  const phaseParam = typeof sp.phase === 'string' ? sp.phase : undefined;
-
   const email = session?.user?.email ?? session?.user?.id ?? 'Account';
+  const name = session?.user?.name;
+  const imageUrl = session?.user?.image;
 
   if (projects.length === 0) {
     return (
       <AppMainConstrained>
-        <div className="mx-auto flex max-w-lg flex-col gap-8">
-          <header className="flex flex-col gap-2">
+        <div className="mx-auto w-full max-w-5xl">
+          <header className="mb-8 border-b border-white/10 pb-6">
             <Link className={WORKSPACE_LINK_CLASS} href="/app">
               ← All projects
             </Link>
-            <h1 className="text-2xl font-semibold tracking-tight text-white">My account</h1>
-            <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-              Signed in as <span className="font-medium text-slate-200">{email}</span>
-            </p>
-            <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-              Create a project first — then you can set the AI model and edit plan JSON here.
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight text-white">Account</h1>
+            <p className={`mt-2 max-w-prose ${WORKSPACE_BODY_CLASS}`}>
+              Manage your profile and preferences.
             </p>
           </header>
-          <div className={`${WORKSPACE_PANEL_CLASS} flex flex-col gap-4 p-6`}>
-            <form action={signOutAction}>
-              <button className={WORKSPACE_ACCENT_BTN_CLASS} type="submit">
-                Sign out
-              </button>
-            </form>
+
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+            <AccountSidebar
+              activeTab={activeTab}
+              email={email}
+              imageUrl={imageUrl}
+              name={name}
+            />
+            <div className="min-w-0 flex-1">
+              {activeTab === 'profile' ? (
+                <AccountProfilePanel email={email} name={name} />
+              ) : (
+                <section className={`${WORKSPACE_PANEL_CLASS} p-5 sm:p-6`}>
+                  <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                    Preferences
+                  </h2>
+                  <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
+                    Create a project first — then you can set the AI model and plan JSON here.
+                  </p>
+                </section>
+              )}
+            </div>
           </div>
         </div>
       </AppMainConstrained>
     );
   }
 
-  const matched =
-    projectParam !== undefined ? projects.find((p) => p.slug === projectParam) : undefined;
-  const activeProject = matched ?? projects[0];
-
-  let activePhaseId: string | null = phaseParam ?? null;
-  if (activeProject.phases.length > 0) {
-    if (!activePhaseId || !activeProject.phases.some((ph) => ph.id === activePhaseId)) {
-      activePhaseId = activeProject.phases[0].id;
-    }
-  } else {
-    activePhaseId = null;
-  }
-
-  const canonical = accountSettingsPath(activeProject.slug, activePhaseId);
-  const currentProjectOk = projectParam === activeProject.slug;
-  const currentPhaseOk = phaseParam === (activePhaseId ?? undefined);
-  if (!currentProjectOk || !currentPhaseOk) {
-    redirect(canonical);
-  }
+  const activeProject = projects[0];
+  const activePhaseId =
+    activeProject.phases.length > 0 ? activeProject.phases[0].id : null;
 
   const snapshot = await prisma.planSnapshot.findFirst({
     where: { projectId: activeProject.id, phaseId: activePhaseId },
@@ -94,41 +97,62 @@ export default async function AccountPage({
   });
   const plan = resolvePlanPayload(snapshot?.payload ?? null);
 
+  const settingsKey = `${activeProject.id}-${activePhaseId ?? 'none'}`;
+
   return (
     <AppMainConstrained>
-      <div className="mx-auto flex max-w-3xl flex-col gap-8">
-        <header className="flex flex-col gap-2">
+      <div className="mx-auto w-full max-w-5xl">
+        <header className="mb-8 border-b border-white/10 pb-6">
           <Link className={WORKSPACE_LINK_CLASS} href="/app">
             ← All projects
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">My account</h1>
-          <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-            Signed in as <span className="font-medium text-slate-200">{email}</span>
-          </p>
-          <p className={`${WORKSPACE_BODY_CLASS} text-sm`}>
-            AI model and plan JSON apply to the selected project and phase.
+          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-white">Account</h1>
+          <p className={`mt-2 max-w-prose ${WORKSPACE_BODY_CLASS}`}>
+            Manage your profile and workspace preferences.
           </p>
         </header>
 
-        <div className={`${WORKSPACE_PANEL_CLASS} flex flex-col gap-6 p-6`}>
-          <AccountContextPicker
-            activePhaseId={activePhaseId}
-            activeProjectSlug={activeProject.slug}
-            projects={projects}
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+          <AccountSidebar
+            activeTab={activeTab}
+            email={email}
+            imageUrl={imageUrl}
+            name={name}
           />
-          <AccountSettingsBlocks
-            activePhaseId={activePhaseId}
-            plan={plan}
-            project={{
-              id: activeProject.id,
-              openaiChatModel: activeProject.openaiChatModel,
-            }}
-          />
-          <form action={signOutAction}>
-            <button className={WORKSPACE_ACCENT_BTN_CLASS} type="submit">
-              Sign out
-            </button>
-          </form>
+
+          <div className="min-w-0 flex-1">
+            {activeTab === 'profile' ? (
+              <AccountProfilePanel email={email} name={name} />
+            ) : (
+              <section className={`${WORKSPACE_PANEL_CLASS} p-5 sm:p-6`}>
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                  Preferences
+                </h2>
+                <p className={`mb-6 max-w-prose ${WORKSPACE_BODY_CLASS} text-sm`}>
+                  AI model and plan apply to{' '}
+                  <span className="text-neutral-300">{activeProject.name}</span>
+                  {activePhaseId ? (
+                    <>
+                      {', phase '}
+                      <span className="text-neutral-300">
+                        {activeProject.phases[0]?.label ?? '—'}
+                      </span>
+                    </>
+                  ) : null}
+                  . The plan JSON editor loads only when you expand it.
+                </p>
+                <AccountSettingsBlocks
+                  key={settingsKey}
+                  activePhaseId={activePhaseId}
+                  plan={plan}
+                  project={{
+                    id: activeProject.id,
+                    openaiChatModel: activeProject.openaiChatModel,
+                  }}
+                />
+              </section>
+            )}
+          </div>
         </div>
       </div>
     </AppMainConstrained>
