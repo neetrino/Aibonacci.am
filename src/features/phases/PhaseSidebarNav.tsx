@@ -30,14 +30,34 @@ const PHASE_LABEL_INPUT_CLASS =
 
 function tasksButtonClass(isTasksPanelOpen: boolean, isRowActive: boolean): string {
   const base =
-    'flex shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20';
+    'flex shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2';
+  if (isTasksPanelOpen && isRowActive) {
+    // Open on solid violet row: inverted chip so it does not merge with row fill.
+    return `${base} border-white/20 bg-white text-violet-800 shadow-sm hover:bg-violet-50 focus-visible:ring-white/50`;
+  }
   if (isTasksPanelOpen) {
-    return `${base} border-violet-500/40 bg-violet-600 text-white shadow-sm hover:bg-violet-500`;
+    return `${base} border-violet-500/40 bg-violet-600 text-white shadow-sm hover:bg-violet-500 focus-visible:ring-violet-300/50`;
   }
   if (isRowActive) {
-    return `${base} border-white/25 bg-white/10 text-white hover:bg-white/15`;
+    // Resting on active row: darker inset chip, reads as secondary to the title link.
+    return `${base} border-violet-900/40 bg-violet-800/70 text-white hover:border-violet-300/35 hover:bg-violet-800 focus-visible:ring-white/35`;
   }
-  return `${base} border-transparent bg-transparent text-neutral-300 hover:border-white/15 hover:bg-neutral-900 hover:text-neutral-100`;
+  return `${base} border-white/[0.07] bg-neutral-900/45 text-neutral-400 hover:border-white/12 hover:bg-neutral-800/90 hover:text-neutral-100 focus-visible:ring-violet-500/35`;
+}
+
+function tasksCountBadgeClass(isRowActive: boolean, isTasksPanelOpen: boolean): string {
+  const base =
+    'flex h-5 min-w-[1.25rem] items-center justify-center rounded-md px-1 text-[10px] font-bold tabular-nums ring-1';
+  if (isTasksPanelOpen && isRowActive) {
+    return `${base} bg-violet-200/90 text-violet-900 ring-violet-300/80`;
+  }
+  if (isTasksPanelOpen) {
+    return `${base} bg-white/12 text-white ring-white/20`;
+  }
+  if (isRowActive) {
+    return `${base} bg-black/30 text-violet-100 ring-violet-200/25`;
+  }
+  return `${base} bg-neutral-950 text-neutral-200 ring-white/10`;
 }
 
 function PhaseChatRow({
@@ -136,16 +156,10 @@ function PhaseChatRow({
           type="button"
           {...{ [TASK_LIST_TOGGLE_DATA_KEY]: '' }}
         >
-          <ListChecksGlyph className="h-4 w-4 shrink-0 opacity-90" />
-          <span
-            className={`flex h-5 min-w-[1.25rem] items-center justify-center rounded-md px-1 text-[10px] font-bold tabular-nums ring-1 ${
-              isActive && !isTasksPanelOpen
-                ? 'bg-black/25 text-white ring-white/25'
-                : 'bg-neutral-950 text-neutral-200 ring-white/10'
-            }`}
-          >
-            {taskCount}
-          </span>
+          <ListChecksGlyph
+            className={`h-4 w-4 shrink-0 ${isTasksPanelOpen && isActive ? 'opacity-100' : 'opacity-90'}`}
+          />
+          <span className={tasksCountBadgeClass(isActive, isTasksPanelOpen)}>{taskCount}</span>
         </button>
       </div>
     </div>
