@@ -17,13 +17,13 @@ import {
 import type { ModelOverride } from './use-project-model-override';
 
 function formatPrice(value: number): string {
-  return `$${value.toFixed(2)}`;
+  return `${value.toFixed(2)}$`;
 }
 
 function modelPriceLabel(modelId: string): string {
   const m = getModelById(modelId);
   if (!m) return '';
-  return `${formatPrice(m.pricing.promptPer1M)} / ${formatPrice(m.pricing.completionPer1M)}`;
+  return `${formatPrice(m.pricing.promptPer1M)}/${formatPrice(m.pricing.completionPer1M)} - 1M`;
 }
 
 export function ReasoningIcon() {
